@@ -1,0 +1,82 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.bg-neutral {
+    background-color: #E9BD94;
+}
+
+.text-neutral-content {
+    color: black;
+}
+
+.main-navbar-h {
+    background-color: #F1F1F1;
+    box-shadow: 0px 4px 9px -1px #999c9c59;
+}
+
+.main-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.p-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2vh;
+    text-align: center;
+}
+
+.r-titles-o{
+    color: #E9760C;
+}
+
+.m-page-content {
+    display: flex;
+    flex-direction: row;
+    margin: 0vw 10vw 0vw 10vw;
+}
+
+.rubric-model-preview {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 6vh;
+    text-align: center;
+    color: white;
+}
+
+.rubric-model-preview-text {
+    margin-top: 3vh;
+    margin-bottom: 1vh;
+}
+
+.rmp-1 {
+    background-color: #E5E5E5;
+}
+.rmp-2 {
+    background-color: #A6A3A0;
+    left: 8vw;
+    top: 1vh;
+}
+
+.rmp-3 {
+    background-color: #B3A08F;
+    right: 8vw;
+    top: 0.5vh;
+}
+
+.footer {
+    max-height: 8vh;
+}
+
+.drawer-text {
+    font-size: large;
+}
+
+.model-preview-group {
+    z-index: 0;
+}
