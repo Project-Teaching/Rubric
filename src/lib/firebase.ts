@@ -94,3 +94,23 @@ export const userData: Readable<UserData | null> = derived(user, ($user, set) =>
     set(null); 
   }
 });  
+
+interface Criterion {
+  name: string;
+  descriptors: string[];
+}
+
+interface PerformanceLevel {
+  name: string;
+  value: number;
+}
+
+interface Rubric {
+  avaliation_name: string;
+  final_date: string;
+  course: string;
+  major: string;
+  uid: string; // Assuming uid is a string. Adjust the type as necessary.
+  criteria: Criterion[];
+  performance_levels: PerformanceLevel[];
+}
