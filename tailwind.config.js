@@ -6,7 +6,28 @@ export default {
   },
   plugins: [require("daisyui")],
   daisyui: {
-    themes: ["light", "dark", "bumblebee", "cyberpunk"],
+    themes: [
+      {
+        LRtheme:{
+          "primary": "#E9760C", // strong orange color
+          "secondary": "#F1F1F1", // light grey color
+          "accent": "#A47950", // brown color
+          "neutral": "#e9bd95", // light orange color
+          "base-100": "#ffffff", // white background
+        },
+        DRtheme:{ // dark version of the theme above
+          "primary": "#E9760C", // strong orange color
+          "secondary": "#1E1E1E", // dark grey color
+          "accent": "#A47950", // brown color1
+          "neutral": "#E9760C", // dark orange
+          "base-100": "#2D2D2D", // dark background
+        },
+      },
+      "light", 
+      "dark", 
+      "bumblebee", 
+      "cyberpunk"
+    ],
   },
 }
 
