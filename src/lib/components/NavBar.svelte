@@ -2,7 +2,7 @@
   import { auth, user } from "$lib/firebase";
   import { onMount } from 'svelte';
   import { writable } from 'svelte/store';
-
+  import { goto } from '$app/navigation';
   const theme = writable('LRtheme');
 
   import {
@@ -27,6 +27,7 @@
   async function signOutSSR() {
       const res = await fetch("/api/signin", { method: "DELETE" });
       await signOut(auth);
+      goto("/");
   }
 
   let isDarkMode = false;

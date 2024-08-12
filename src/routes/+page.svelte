@@ -50,7 +50,7 @@
             </div>
             <div class="rubric-model-preview-text">
               <h1 class="text-2xl font-bold text-primary">Começe Agora Mesmo!</h1>
-              <a href="/rubricas/criar modelo" class="text-primary font-bold text-1xl">Clique aqui para criar sua primeira rubrica de avaliação</a>
+              <a href="/rubricas/" class="text-primary font-bold text-1xl">Clique aqui para criar sua primeira rubrica de avaliação</a>
             </div>
           </div> 
         </div>

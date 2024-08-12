@@ -13,7 +13,7 @@ export const load = async ({ locals }) => {
 
     // Cria uma rubrica em branco
     const blankRubric = {
-        avaliation_name: '',
+        model_name: '',
         final_date: '',
         course: '',
         major: '',

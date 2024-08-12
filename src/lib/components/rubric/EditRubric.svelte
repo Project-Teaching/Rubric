@@ -15,7 +15,7 @@
   }
 
   interface Rubric {
-    avaliation_name: string;
+    model_name: string;
     final_date: string;
     course: string;
     major: string;
@@ -55,8 +55,8 @@
       rubric.update((r) => {
           if (r) {
               // Atualize o campo específico da rubrica
-              if(field === 'avaliation_name') {
-                r.avaliation_name = value;
+              if(field === 'model_name') {
+                r.model_name = value;
                 saveRubricField(docId, field, value);
               }
               else if(field.includes('criteria')) {
@@ -179,7 +179,7 @@
     <div class="flex justify-center">
       <label class="input flex items-center gap-2 max-w">
         Nome da Avaliação:
-        <input id="avaliation_name"  type="text" class="grow bg-secondary p-1 text-lg rounded-md max-h-7" value={$rubric.avaliation_name}  on:keydown={(e) => e.key === 'Enter' && handleFieldChange('avaliation_name', e.target.value)} />
+        <input id="model_name"  type="text" class="grow bg-secondary p-1 text-lg rounded-md max-h-7" value={$rubric.model_name}  on:keydown={(e) => e.key === 'Enter' && handleFieldChange('model_name', e.target.value)} />
       </label>
       <label class="input flex items-center gap-2 max-w">
         Prazo Final:
@@ -204,7 +204,7 @@
       </label>
     </div>
     <div class="max-w-full max-h-96 overflow-x-auto overflow-y-auto">
-      <table class="w-full border-collapse mt-5">
+      <table class="table-auto w-full border-collapse mt-5">
         <thead class="bg-secondary text-md">
           <tr>
             <th class="border border-accent border-solid">Critério</th>
