@@ -3,6 +3,7 @@
   import NavBar from "$lib/components/NavBar.svelte";
   import Footer from "$lib/components/Footer.svelte";
   import Breadcrumbs from "$lib/components/Breadcrumbs.svelte";
+  import Drawer from '$lib/components/Drawer.svelte';
   import { goto } from '$app/navigation';
   import { doc, deleteDoc } from 'firebase/firestore';
   import { db } from '$lib/firebase'; // Ajuste o caminho conforme sua configuração
@@ -101,53 +102,49 @@
         
           <div class="flex flex-wrap gap-8">
             {#each rubricas as rubrica (rubrica.id)}
-              <div class="flex flex-col h-60 w-[25vw] mb-2">
-                <div class="bg-secondary h-52 p-4 rounded-lg shadow-md">
-                  <div class="flex  justify-between inset-0">
-                    <div class="bg-base-200 text-accent font-bold p-2 rounded mb-2 w-4/5">
+              <div class="flex flex-col h-44 w-[25vw] mb-2">
+                <div class="bg-secondary h-32 m-3 rounded-lg shadow-md hover-up">
+                  <div class="flex m-4 inset-0 h-full">
+                    <div class="text-bg-200 font-bold p-2 rounded mb-2 w-4/5 h-min">
                       N° de Curso(s): 3 <br/>
-                      N° de Disciplina(s): 5 <br/>
-                      N° de Avaliações: 10
+                      N° de Disciplina(s): 15 <br/>
+                      N° de Avaliações: 20
                     </div>
-                    <button on:click={() => abrirModal(rubrica.id)} class="pb-1 bg-error-content hover:bg-error w-8 h-8 text-white rounded-full">
-                      <span class="text-xl font-bold">x</span>
-                    </button>
+                    <div class="flex flex-col items-end inset-0 ml-4 gap-y-4">
+                      <button on:click={() => abrirModal(rubrica.id)} class="pb-1 bg-error-content hover:bg-error w-8 h-8 text-white rounded-full">
+                        <span class="text-xl font-bold">x</span>
+                      </button>
+                      <button on:click={() => editarRubrica(rubrica.id)} class="btn btn-primary text-white w-12 h-12 rounded-full flex items-center justify-center">
+                        <span class="text-2xl font-bold">+</span>
+                      </button>
+                    </div>
                   </div>
-                  <div class="flex justify-end items-end inset-0 p-2 mt-8">
-                    <button on:click={() => editarRubrica(rubrica.id)} class="btn btn-primary text-white w-12 h-12 rounded-full flex items-center justify-center">
-                      <span class="text-2xl font-bold">+</span>
-                    </button>
-                  </div>
+
                 </div>
-                <p class="text-center mt-2 text-primary font-semibold">
+                <p class="text-center text-primary font-semibold">
                     {rubrica.model_name ? rubrica.model_name : "Modelo Temporariamente Não-Nomeado"}
                 </p>
               </div>
             {/each}
-            <div class="flex flex-col h-60 w-[25vw] mb-2">
-              <div class="bg-secondary h-52 p-4 rounded-lg shadow-md">
-                <div class="flex justify-end items-end inset-0 p-2 mt-[17vh]">
-                  <button on:click={criarNovaRubrica} class="bg-primary text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg">
-                    <span class="text-2xl font-bold">+</span>
-                  </button>
+            <div class="flex flex-col h-44 w-[25vw] mb-2">
+              <div class="bg-secondary h-32 m-3 rounded-lg shadow-md hover-up">
+                <div class="flex justify-end items-end m-4 inset-0">
+                  <div class="mt-12">
+                    <button on:click={criarNovaRubrica} class="bg-primary text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg">
+                      <span class="text-2xl font-bold">+</span>
+                    </button>
+                  </div>
                 </div>
+
               </div>
-              <p class="text-center mt-2 text-primary font-semibold">
-                Crie seu próprio modelo personalizado
+              <p class="text-center text-primary font-semibold">
+                  Crie seu próprio modelo personalizado
               </p>
             </div>
           </div>
         </section>
       </div>
-      <div class="drawer-side">
-        <label for="my-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
-        <ul class="menu bg-base-200 text-base-content min-h-full w-80 p-4 font-bold drawer-text">
-          <li><a href="/">Gerenciador de Rubricas</a></li>
-          <li><a href="/">Cursos e Disciplinas</a></li>
-          <li><a href="/">Modelos de Rubricas</a></li>
-          <li><a href="/">Suporte</a></li>
-        </ul>
-      </div>
+      <Drawer></Drawer>
     </div>
   </div>
   <Footer></Footer>
@@ -167,3 +164,15 @@
     </div>
   </dialog>
 </main>
+
+<style>
+  .hover-up {
+      transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  }
+
+  .hover-up:hover {
+      transform: scale(1.01);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+</style>

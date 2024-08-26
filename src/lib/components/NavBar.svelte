@@ -3,6 +3,7 @@
   import { onMount } from 'svelte';
   import { writable } from 'svelte/store';
   import { goto } from '$app/navigation';
+
   const theme = writable('LRtheme');
 
   import {
@@ -31,13 +32,25 @@
   }
 
   let isDarkMode = false;
+  let logoURL = '/RProLogoWhite.png';
+  let logoWhite = '/RProLogoWhite.png';
+  let logoDark = '/RProLogoDark.png';
+  let logoClass = 'logo-visible';
 
   function toggleTheme() {
+    logoClass = 'logo-hidden'; // fade start
+    setTimeout(() => {
     const newTheme = isDarkMode ? 'LRtheme' : 'DRtheme';
     theme.set(newTheme);
     document.documentElement.setAttribute('data-theme', newTheme);
     localStorage.setItem('theme', newTheme);
     isDarkMode = !isDarkMode;
+
+    // Change Logo Theme
+    logoURL = isDarkMode ? logoWhite: logoDark;
+
+    logoClass = 'logo-visible'; // fade end
+    }, 150); // atraso
   }
 
   onMount(() => {
@@ -45,12 +58,13 @@
     theme.set(savedTheme);
     document.documentElement.setAttribute('data-theme', savedTheme);
     isDarkMode = savedTheme === 'DRtheme';
+    logoURL = isDarkMode ? logoWhite: logoDark;
   });
 </script>
 
 <div class="navbar bg-secondary main-navbar-h">
   <div class="flex-1">
-    <label for="my-drawer" class="btn btn-ghost text-xl drawer-button">||| Rubric</label>
+    <label for="my-drawer" class="btn btn-ghost text-xl drawer-button">||| <div class="w-24 ml-2 h-10"><img alt="User Profile" src={logoURL} class="logo-transition {logoClass}"></div></label>
   </div>
   <div class="flex-none gap-2">
     {#if $user}
@@ -63,7 +77,7 @@
             <img alt="User Profile" src={$user.photoURL ?? "/user.png"}/>
           </div>
         </div>
-        <ul tabindex="0" class="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow">
+        <ul tabindex="0" class="menu menu-sm dropdown-content bg-secondary rounded-box z-[1] mt-3 w-52 p-2 shadow">
           <li>
             <a class="justify-between">
               Perfil

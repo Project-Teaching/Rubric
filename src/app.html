@@ -3,15 +3,35 @@
 
 <head>
 	<meta charset="utf-8" />
-	<link rel="icon" href="%sveltekit.assets%/favicon.png" />
+	<link id="favicon" rel="icon" href="%sveltekit.assets%/RP-light.png" />
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	%sveltekit.head%
 	<script>
-		// Função para definir o tema com base no localStorage
 		(function() {
+		  // Função para definir o tema e o favicon com base no localStorage
 		  const savedTheme = localStorage.getItem('theme') || 'LRtheme';
 		  document.documentElement.setAttribute('data-theme', savedTheme);
+
+		  // Define o favicon com base no tema
+		  const favicon = document.getElementById('favicon');
+		  if (savedTheme === 'DRtheme') {
+			favicon.href = '%sveltekit.assets%/RP-Light.png';
+		  } else {
+			favicon.href = '%sveltekit.assets%/RP-Dark.png';
+		  }
 		})();
+
+		// Observa mudanças no tema e atualiza o favicon dinamicamente
+		const themeObserver = new MutationObserver(() => {
+			const currentTheme = document.documentElement.getAttribute('data-theme');
+			const favicon = document.getElementById('favicon');
+			if (currentTheme === 'DRtheme') {
+				favicon.href = '%sveltekit.assets%/RP-Light.png';
+			} else {
+				favicon.href = '%sveltekit.assets%/RP-Dark.png';
+			}
+		});
+		themeObserver.observe(document.documentElement, { attributes: true });
 	</script>
 </head>
 
