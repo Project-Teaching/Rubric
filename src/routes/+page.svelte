@@ -1,6 +1,7 @@
 <script>
   import NavBar from "$lib/components/NavBar.svelte";
   import Footer from "$lib/components/Footer.svelte";
+    import Drawer from "$lib/components/Drawer.svelte";
 </script>
   
   <svelte:head>
@@ -54,15 +55,7 @@
             </div>
           </div> 
         </div>
-        <div class="drawer-side">
-          <label for="my-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
-          <ul class="menu bg-base-200 text-base-content min-h-full w-80 p-4 font-bold drawer-text">
-            <li><a href="/">Gerenciador de Rubricas</a></li>
-            <li><a href="/">Cursos e Disciplinas</a></li>
-            <li><a href="/">Modelos de Rubricas</a></li>
-            <li><a href="/">Suporte</a></li>
-          </ul>
-        </div>
+        <Drawer></Drawer>
       </div>
     </div>
     <Footer></Footer>
