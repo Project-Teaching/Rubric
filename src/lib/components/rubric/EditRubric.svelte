@@ -16,9 +16,8 @@
 
   interface Rubric {
     model_name: string;
-    final_date: string;
-    course: string;
-    major: string;
+    course: string; // Alterado para array de strings
+    major: string; // Alterado para array de strings
     uid: string;
     criteria: Criterion[];
     performance_levels: PerformanceLevel[];
@@ -27,6 +26,9 @@
   export let docId: string;
 
   let rubric = writable<Rubric | null>(null);
+
+  let newCourse = ""; // Para armazenar o valor do input do curso
+  let newMajor = ""; // Para armazenar o valor do input do major
 
   async function fetchRubric(id: string) {
     const docRef = doc(db, 'rubrics', id);
@@ -78,11 +80,6 @@
               else if(field === 'major'){
                 r.major = value;
                 saveRubricField(docId, field, value);
-              }
-              else if(field === 'final_date'){
-                r.final_date = value;
-                saveRubricField(docId, field, value);
-              
               }
           }
           return r;
@@ -180,10 +177,6 @@
       <label class="input flex items-center gap-2 max-w">
         Nome da Avaliação:
         <input id="model_name"  type="text" class="grow bg-secondary p-1 text-lg rounded-md max-h-7" value={$rubric.model_name}  on:keydown={(e) => e.key === 'Enter' && handleFieldChange('model_name', e.target.value)} />
-      </label>
-      <label class="input flex items-center gap-2 max-w">
-        Prazo Final:
-        <input id="final_date"  type="date" class="grow bg-secondary p-1 text-lg rounded-md max-h-7" value={$rubric.final_date}  on:change={(e) => handleFieldChange('final_date', e.target.value)} />
       </label>
       <label class="input flex items-center gap-2 max-w">
         Curso:

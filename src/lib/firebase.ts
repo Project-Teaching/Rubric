@@ -107,7 +107,6 @@ interface PerformanceLevel {
 
 interface Rubric {
   avaliation_name: string;
-  final_date: string;
   course: string;
   major: string;
   uid: string; // Assuming uid is a string. Adjust the type as necessary.
