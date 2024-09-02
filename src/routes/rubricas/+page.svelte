@@ -9,7 +9,7 @@
   import { db } from '$lib/firebase'; // Ajuste o caminho conforme sua configuração
 
   let rubricas: { 
-        id: string, final_date: string, uid: string, major: string, course: string, performance_levels:any[], criteria: any[], model_name: string
+        id: string, uid: string, major: string, course: string, performance_levels:any[], criteria: any[], model_name: string
       }[]; 
 
   let rubricaParaRemover: string | null = null;
@@ -68,12 +68,6 @@
     }
   }
 </script>
-
-<svelte:head>
-  <title>Rubric App</title>
-  <meta name="description" content="Rubric Assessment App" />
-</svelte:head>
-
 <main class="flex flex-col min-h-screen">
   <NavBar></NavBar>
   <Breadcrumbs />

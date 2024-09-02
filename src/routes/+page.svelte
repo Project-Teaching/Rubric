@@ -3,11 +3,6 @@
   import Footer from "$lib/components/Footer.svelte";
     import Drawer from "$lib/components/Drawer.svelte";
 </script>
-  
-  <svelte:head>
-    <title>Rubric App</title>
-    <meta name="description" content="Rubric Assessment App" />
-  </svelte:head>
 
   <main class="flex flex-col min-h-screen">
     <NavBar></NavBar>
