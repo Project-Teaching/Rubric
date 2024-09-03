@@ -34,6 +34,7 @@
     if ($rubric) {
       textarea.value = $rubric.criteria[cIndex].descriptors[dIndex];
     }
+    // @ts-ignore
     document.getElementById('edit_modal')?.showModal();
   }
 
@@ -46,12 +47,13 @@
       // Atualiza o estado e o Firestore
       rubric.update((r) => {
         if (r) {
+          // @ts-ignore
           r.criteria[criterionIndex].descriptors[descriptorIndex] = newDescriptor;
           saveRubricField(docId, 'criteria', r.criteria);
         }
         return r;
       });
-
+      // @ts-ignore
       document.getElementById('edit_modal')?.close();
     }
   }
@@ -379,7 +381,10 @@
         <textarea id="descriptor_textarea" class="textarea textarea-bordered w-full h-32" placeholder="Digite o descritor aqui..."></textarea>
         <div class="modal-action">
           <button on:click={saveDescriptor} class="btn btn-primary">Salvar</button>
-          <button on:click={() => document.getElementById('edit_modal')?.close()} class="btn btn-secondary">Cancelar</button>
+          <form method="dialog">
+            <!-- if there is a button in form, it will close the modal -->
+            <button class="btn btn-secondary">Cancelar</button>
+          </form>
         </div>
       </div>
     </dialog>

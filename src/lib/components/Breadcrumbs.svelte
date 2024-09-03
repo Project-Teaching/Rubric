@@ -9,13 +9,20 @@
   function generateBreadcrumbs(pathname) {
     const segments = pathname.split('/').filter(Boolean);
     const breadcrumbs = segments.map((segment, index) => {
-      const href = '/' + segments.slice(0, index + 1).join('/');
+      // Verifique se o segmento parece ser um ID (você pode ajustar a verificação conforme necessário)
+      if (isId(segment)) {
+        return { 
+          segment: null, 
+          href: '/' + segments.slice(0, index + 1).join('/'), 
+          isCurrent: index === segments.length - 1 
+        };
+      }
       return { 
         segment: capitalize(decodeURIComponent(segment)), 
-        href, 
+        href: '/' + segments.slice(0, index + 1).join('/'), 
         isCurrent: index === segments.length - 1 
       };
-    });
+    }).filter(breadcrumb => breadcrumb.segment); // Filtra breadcrumbs sem segmento
     return breadcrumbs;
   }
 
@@ -25,6 +32,15 @@
      */
   function capitalize(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
+  }
+
+  // Função para verificar se o segmento parece ser um ID
+  /**
+     * @param {string} segment
+     */
+  function isId(segment) {
+    // Ajuste a lógica conforme necessário para identificar IDs
+    return segment.length === 20 && /^[A-Za-z0-9]+$/.test(segment); // Exemplo para IDs do Firebase
   }
 
   // Store derivada para os breadcrumbs
