@@ -4,6 +4,10 @@
     import Drawer from "$lib/components/Drawer.svelte";
 </script>
 
+<svelte:head>
+  <title>Rubric App</title>
+</svelte:head>
+
   <main class="flex flex-col min-h-screen">
     <NavBar></NavBar>
     <div class="flex-grow main-content">

@@ -16,6 +16,11 @@
     }
   }
 </script>
+
+<svelte:head>
+  <title>Rubric App</title>
+</svelte:head>
+
     <main class="flex flex-col min-h-screen">
       <NavBar></NavBar>
       <Breadcrumbs />
