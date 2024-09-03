@@ -22,7 +22,7 @@
 
   // Função para redirecionar para a página de edição
   function editarRubrica(id: string) {
-      goto(`/rubricas/${id}/edit`);
+      goto(`/rubricas/${id}/editar modelo`);
   }
 
   // Função para criar um novo modelo de rubrica
