@@ -3,6 +3,7 @@
   import { db } from '$lib/firebase';
   import { onMount } from 'svelte';
   import { writable } from 'svelte/store';
+  import { createEventDispatcher } from "svelte";
 
   interface Criterion {
     name: string;
@@ -25,8 +26,9 @@
 
   let descriptorIndex: number | null = null;
   let criterionIndex: number | null = null;
+  let isOver: number | null = null;
 
-  // Função para abrir o modal
+  // Função para abrir o modal de edição de descritor
   function openEditModal(cIndex: number, dIndex: number) {
     descriptorIndex = dIndex;
     criterionIndex = cIndex;
@@ -256,6 +258,53 @@
       });
   }
   // CONTROLADORES DAS TAGS - END
+
+  // CONTROLE DE DRAG AND DROP - START
+  const dispatch = createEventDispatcher();
+
+  // Função para obter o elemento pai do elemento arrastado
+  function getDraggedParent(node: any): any {
+    if (!node.dataset.index) {
+      return getDraggedParent(node.parentNode);
+    } else {
+      return { ...node.dataset };
+    }
+  }
+  // Função para lidar com o evento de arrastar START
+  function onDragStart(e: DragEvent) {
+    const dragged = getDraggedParent(e.target);
+    e.dataTransfer?.setData("source", dragged?.index.toString());
+  }
+  // Função para lidar com o evento de arrastar END
+  function onDragOver(e: DragEvent) {
+    const over = getDraggedParent(e.target);
+    isOver = over.id;
+  }
+  // Função para lidar com o evento de arrastar e soltar
+  function onDrop(e: DragEvent) {
+    const sourceIndex = e.dataTransfer?.getData("source");
+    const target = getDraggedParent(e.target);
+    reorder({ from: parseInt(sourceIndex), to: parseInt(target.index) });
+    isOver = false;
+  }
+  // Função para reordenar os elementos
+  async function reorder({ from, to }: any) {
+    rubric.update((r) => {
+      if (r) {
+        const newCriterions = [...r.criteria];
+        const [movedCriterion] = newCriterions.splice(from, 1);
+        newCriterions.splice(to, 0, movedCriterion);
+
+        r.criteria = newCriterions;
+        saveRubricGrid(docId, { criteria: newCriterions });
+
+        dispatch("sort", newCriterions);
+      }
+      return r;
+    });
+  }
+  // CONTROLE DE DRAG AND DROP - END
+
   onMount(() => {
     fetchRubric(docId);
   });
@@ -263,7 +312,9 @@
 </script>
 
 <style>
-
+  .over {
+    @apply border-gray-400 scale-105;
+  }
 </style>
 
 {#if $rubric}
@@ -313,7 +364,16 @@
         </thead>
         <tbody class="text-center">
           {#each $rubric.criteria as criterion, cIndex}
-            <tr>
+            <tr
+            class="transition-all"
+            class:over={cIndex === isOver}
+            data-index={cIndex}
+            data-id={cIndex}
+            draggable="true"
+            on:dragstart={onDragStart}
+            on:dragover|preventDefault={onDragOver}
+            on:drop={onDrop}
+            >
               <td class="border border-accent border-solid p-2">
                 <input 
                   class="grow bg-secondary p-1 text-lg rounded-md max-h-7 text-center font-medium"
