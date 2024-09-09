@@ -30,7 +30,7 @@
           <div class="drawer-content">
             <!-- Conteúdo principal aqui -->
             <div class="h-2 flex justify-center"> <!-- Bloco de Texto Principal 1 -->
-              <h1 class="text-2xl font-bold text-primary">Rubrica de Avaliação Modelo Personalizado</h1>
+              <h1 class="text-2xl font-bold text-primary-500">Rubrica de Avaliação Modelo Personalizado</h1>
             </div>
             
             {#if docId}

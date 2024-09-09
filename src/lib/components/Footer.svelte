@@ -3,7 +3,7 @@
 </script>
 
 
-<footer class="footer bg-primary text-neutral-content items-center p-4">
+<footer class="footer bg-primary-500 text-neutral-content items-center p-4">
   <aside class="grid-flow-col items-center">
     <svg
       width="30"

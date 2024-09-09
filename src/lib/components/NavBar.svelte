@@ -3,7 +3,8 @@
   import { onMount } from 'svelte';
   import { writable } from 'svelte/store';
   import { goto } from '$app/navigation';
-
+  import { LightSwitch } from '@skeletonlabs/skeleton';
+						
   const theme = writable('LRtheme');
 
   import {
@@ -40,31 +41,35 @@
   function toggleTheme() {
     logoClass = 'logo-hidden'; // fade start
     setTimeout(() => {
-    const newTheme = isDarkMode ? 'LRtheme' : 'DRtheme';
-    theme.set(newTheme);
-    document.documentElement.setAttribute('data-theme', newTheme);
-    localStorage.setItem('theme', newTheme);
-    isDarkMode = !isDarkMode;
+      const newTheme = isDarkMode ? 'light' : 'dark';
+      // Atualize o estado isDarkMode antes de alterar a classe
+      isDarkMode = !isDarkMode;
+      theme.set(newTheme);
+      localStorage.setItem('theme', newTheme);
+      
+      // Remove a classe do tema atual e adiciona a nova classe
+      document.documentElement.classList.remove(isDarkMode ? 'light' : 'dark');
+      document.documentElement.classList.add(newTheme);
 
-    // Change Logo Theme
-    logoURL = isDarkMode ? logoWhite: logoDark;
+      // Mude o logo conforme o novo tema
+      logoURL = isDarkMode ? logoWhite : logoDark;
 
-    logoClass = 'logo-visible'; // fade end
+      logoClass = 'logo-visible'; // fade end
     }, 150); // atraso
   }
 
   onMount(() => {
-    const savedTheme = localStorage.getItem('theme') || 'LRtheme';
+    const savedTheme = localStorage.getItem('theme') || 'light';
     theme.set(savedTheme);
-    document.documentElement.setAttribute('data-theme', savedTheme);
-    isDarkMode = savedTheme === 'DRtheme';
+    document.documentElement.classList.add(savedTheme);
+    isDarkMode = savedTheme === 'dark';
     logoURL = isDarkMode ? logoWhite: logoDark;
   });
 </script>
 
-<div class="navbar bg-secondary main-navbar-h">
+<div class="navbar bg-secondary-500 dark:bg-dark-secondary main-navbar-h shadow-sm">
   <div class="flex-1">
-    <label for="my-drawer" class="btn btn-ghost text-xl drawer-button">||| <div class="w-24 ml-2 h-10"><img alt="User Profile" src={logoURL} class="logo-transition {logoClass}"></div></label>
+    <label for="my-drawer" class="btn btn-ghost text-xl drawer-button">||| <div class="w-24 ml-2 h-10"><img src={logoURL} class="logo-transition {logoClass}"></div></label>
   </div>
   <div class="flex-none gap-2">
     {#if $user}
@@ -77,13 +82,13 @@
             <img alt="User Profile" src={$user.photoURL ?? "/user.png"}/>
           </div>
         </div>
-        <ul tabindex="0" class="menu menu-sm dropdown-content bg-secondary rounded-box z-[1] mt-3 w-52 p-2 shadow">
-          <li>
-            <a class="justify-between">
+        <ul tabindex="0" class="menu menu-sm rounded-xl dropdown-content bg-secondary-500 dark:bg-dark-secondary rounded-box z-[1] mt-4 w-52 p-2 shadow">
+          <li class="text-base font-medium">
+            <a href="#" class="justify-between">
               Perfil
             </a>
           </li>
-          <li><button on:click={signOutSSR}>Sair</button></li>
+          <li class="text-base font-medium"><button on:click={signOutSSR}>Sair</button></li>
         </ul>
       </div>
       <label class="swap swap-rotate">

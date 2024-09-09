@@ -4,6 +4,7 @@
   import { onMount } from 'svelte';
   import { writable } from 'svelte/store';
   import { createEventDispatcher } from "svelte";
+  import TagAutoComplete from '../TagAutoComplete.svelte';
 
   interface Criterion {
     name: string;
@@ -315,44 +316,50 @@
   .over {
     @apply border-gray-400 scale-105;
   }
+  
+  th {
+    max-width: 15.5vw;
+    min-width: 15.5vw;;
+  }
 </style>
 
 {#if $rubric}
   <div class="rubric-matrix m-6 bg">
     <div class="flex justify-between mb-4">
       <div>
-        <button class="btn btn-primary ml-2" on:click={addCriterion}>Linha +</button>
-        <button class="btn btn-secondary" on:click={() => removeCriterion($rubric.criteria.length - 1)}>Linha -</button>
+        <button class="btn variant-filled-primary ml-2" on:click={addCriterion}>Linha +</button>
+        <button class="btn variant-filled-secondary" on:click={() => removeCriterion($rubric.criteria.length - 1)}>Linha -</button>
       </div>
       <div>
-        <button class="btn btn-error hover-up ml-2 mt-2" on:click={resetGrid}>Limpar Grid</button>
+        <button class="btn variant-filled-error hover-up ml-2 mt-2" on:click={resetGrid}>Limpar Grid</button>
       </div>
       <div>
-        <button class="btn btn-primary" on:click={addPerformanceLevel}>Coluna +</button>
-        <button class="btn btn-secondary mr-2" on:click={() => removePerformanceLevel($rubric.performance_levels.length - 1)}>Coluna -</button>
+        <button class="btn variant-filled-primary" on:click={addPerformanceLevel}>Coluna +</button>
+        <button class="btn variant-filled-secondary mr-2" on:click={() => removePerformanceLevel($rubric.performance_levels.length - 1)}>Coluna -</button>
       </div>
     </div>
-    <div class="flex justify-start">
-      <label class="input flex items-center gap-2 max-w">
+    <div class="flex justify-start w-20">
+      <label class="input dark:bg-dark-surface border-none flex items-center gap-2 max-w">
         Nome da Avaliação:
-        <input id="model_name"  type="text" class="grow bg-secondary p-1 text-lg rounded-md max-h-7" value={$rubric.model_name}  on:keydown={(e) => e.key === 'Enter' && handleFieldChange('model_name', e.target?.value)} />
+        <input id="model_name"  type="text" class="grow bg-secondary-500 dark:bg-dark-secondary p-1 text-lg rounded-md max-h-7" value={$rubric.model_name}  on:keydown={(e) => e.key === 'Enter' && handleFieldChange('model_name', e.target?.value)} />
       </label>
     </div>
-    <div class="max-w-full max-h-96 overflow-x-auto overflow-y-auto">
-      <table class="table-auto w-full border-collapse mt-5">
-        <thead class="bg-secondary text-md">
+    <div class="max-w-[100vw] max-h-96 overflow-x-auto overflow-y-auto">
+      <table class="table-fixed border-collapse mt-5">
+        <thead class="table-header-group bg-secondary-500 dark:bg-dark-secondary text-md">
           <tr>
-            <th class="border border-accent border-solid">Critério</th>
+            <th class="border border-tertiary-500 border-solid">Critério</th>
             {#each $rubric.performance_levels as level}
-              <th class="border border-accent border-solid p-4">
+              <th class="border border-tertiary-500 border-solid p-4">
                 <input
-                class="grow bg-base-100 p-1 text-lg rounded-md max-h-7 text-center max-w-32" 
+                class="grow bg-surface-500 dark:bg-dark-surface p-1 text-lg rounded-md max-h-7 text-center max-w-48" 
                 type="text" 
                 value={level.name} 
                 on:keydown={(e) => e.key === 'Enter' && handleFieldChange(`performance_levels.${$rubric.performance_levels.indexOf(level)}.name`, e.target?.value)}
-                />  
+                /> 
+                <br /> 
                 <input
-                class="grow bg-base-100 text-lg rounded-md max-h-7 text-center max-w-16 mt-1" 
+                class="grow bg-surface-500 dark:bg-dark-surface text-lg rounded-md max-h-7 text-center max-w-16 mt-1" 
                 type="number"
                 min="0"
                 value={level.value}
@@ -362,7 +369,7 @@
             {/each}
           </tr>
         </thead>
-        <tbody class="text-center">
+        <tbody class="table-row-group text-center">
           {#each $rubric.criteria as criterion, cIndex}
             <tr
             class="transition-all"
@@ -374,18 +381,18 @@
             on:dragover|preventDefault={onDragOver}
             on:drop={onDrop}
             >
-              <td class="border border-accent border-solid p-2">
+              <td class="border border-tertiary-500 border-solid p-2">
                 <input 
-                  class="grow bg-secondary p-1 text-lg rounded-md max-h-7 text-center font-medium"
+                  class="grow bg-secondary-500 dark:bg-dark-secondary p-1 text-lg rounded-md max-h-7 text-center font-medium"
                   type="text" 
                   value={criterion.name} 
                   on:keydown={(e) => e.key === 'Enter' && handleFieldChange(`criteria.${cIndex}.name`, e.target?.value)} 
                 />
               </td>
               {#each criterion.descriptors as descriptor, dIndex}
-                <td class="border border-accent border-solid p-0.5">
+                <td class="border border-tertiary-500 border-solid p-0.5 max-w-32 min-w-32 break-words">
                   <div
-                  class="w-full min-h-20 max-h-20 p-0.5 overflow-auto text-center text-sm bg-secondary font-medium"
+                  class="w-full min-h-20 max-h-20 p-0.5 overflow-auto text-center text-sm bg-secondary-500 dark:bg-dark-secondary font-medium"
                   role="button"
                   tabindex="0"
                   on:click={() => openEditModal(cIndex, dIndex)}
@@ -401,15 +408,21 @@
         </tbody>
       </table>
     </div>
-    <div class="flex justify-center mt-2">
-      <label class="input flex items-center gap-2 max-w">Cursos:
-        <input id="major" type="text" class="grow bg-secondary p-1 text-lg rounded-md max-h-7"
+    <div class="flex justify-start">
+       <!--<label class="input flex items-center gap-2 max-w">Cursos:
+       <input id="major" type="text" class="grow bg-secondary p-1 text-lg rounded-md max-h-7"
         on:keydown={(e) => e.key === 'Enter' && handleFieldChange('major', e.target?.value)} />
-      </label>
-      <label class="input flex items-center gap-2 max-w">Disciplinas:
+      </label>-->
+      <div class="w-max m-2">
+        <TagAutoComplete />
+      </div>
+      <div class="w-max m-2">
+        <TagAutoComplete />
+      </div>
+      <!--<<label class="input flex items-center gap-2 max-w">Disciplinas:
         <input id="course" type="text" class="grow bg-secondary p-1 text-lg rounded-md max-h-7"
         on:keydown={(e) => e.key === 'Enter' && handleFieldChange('course', e.target?.value)} />
-      </label>
+      </label>-->
     </div>
     <div class="flex justify-between">
       <div class="flex justify-center items-center flex-col">      
@@ -436,14 +449,14 @@
 
     <!-- Modal para editar descritores -->
     <dialog id="edit_modal" class="modal">
-      <div class="modal-box">
-        <h3 class="text-lg font-bold">Editar Descritor</h3>
-        <textarea id="descriptor_textarea" class="textarea textarea-bordered w-full h-32" placeholder="Digite o descritor aqui..."></textarea>
+      <div class="modal-box bg-secondary-500 dark:bg-dark-surface p-2">
+        <h3 class="text-lg font-bold mb-2">Editar Descritor</h3>
+        <textarea id="descriptor_textarea" class="textarea textarea-bordered w-full h-32 bg-surface-200 dark:bg-dark-secondary border-none" placeholder="Digite o descritor aqui..."></textarea>
         <div class="modal-action">
-          <button on:click={saveDescriptor} class="btn btn-primary">Salvar</button>
+          <button on:click={saveDescriptor} class="btn bg-primary-500">Salvar</button>
           <form method="dialog">
             <!-- if there is a button in form, it will close the modal -->
-            <button class="btn btn-secondary">Cancelar</button>
+            <button class="btn bg-secondary-500 dark:bg-dark-secondary">Cancelar</button>
           </form>
         </div>
       </div>

@@ -73,7 +73,7 @@
   <title>Rubric App</title>
 </svelte:head>
 
-<main class="flex flex-col min-h-screen">
+<main class="flex flex-col min-h-screen dark:bg-dark-surface">
   <NavBar></NavBar>
   <Breadcrumbs />
   <div class="flex-grow main-content">
@@ -82,7 +82,7 @@
       <div class="drawer-content">
         <!-- Conteúdo principal aqui -->
         <div class="h-2 flex justify-center"> <!-- Bloco de Texto Principal 1 -->
-          <h1 class="text-2xl font-bold text-primary">Gerenciador de Rubricas de Avaliação</h1>
+          <h1 class="text-2xl font-bold text-primary-500">Gerenciador de Rubricas de Avaliação</h1>
         </div>
         <section class="container mx-auto mt-10">
           <!-- svelte-ignore a11y-missing-content -->
@@ -96,13 +96,13 @@
           {/if}
         
           <div class="flex justify-center mb-5">
-            <button class="btn btn-primary text-white py-2 px-4 rounded">Pesquisar Modelos</button>
+            <button class="btn variant-filled-primary text-white dark:text-white py-2 px-4 rounded">Pesquisar Modelos</button>
           </div>
         
           <div class="flex flex-wrap gap-8">
             {#each rubricas as rubrica (rubrica.id)}
               <div class="flex flex-col h-44 w-[25vw] mb-2">
-                <div class="bg-secondary h-32 m-3 rounded-lg shadow-md hover-up">
+                <div class="bg-secondary-500 dark:bg-dark-secondary h-32 m-3 rounded-lg shadow-md hover-up">
                   <div class="flex m-4 inset-0 h-full">
                     <div class="text-bg-200 font-bold p-2 rounded mb-2 w-4/5 h-min">
                       N° de Curso(s): 3 <br/>
@@ -110,33 +110,33 @@
                       N° de Avaliações: 20
                     </div>
                     <div class="flex flex-col items-end inset-0 ml-4 gap-y-4">
-                      <button on:click={() => abrirModal(rubrica.id)} class="pb-1 bg-error-content hover:bg-error w-8 h-8 text-white rounded-full">
+                      <button on:click={() => abrirModal(rubrica.id)} class="pb-1 bg-error-500 hover:bg-error-900 w-8 h-8 text-white rounded-full">
                         <span class="text-xl font-bold">x</span>
                       </button>
-                      <button on:click={() => editarRubrica(rubrica.id)} class="btn btn-primary text-white w-12 h-12 rounded-full flex items-center justify-center">
+                      <button on:click={() => editarRubrica(rubrica.id)} class="btn variant-filled-primary text-white dark:text-white w-12 h-12 rounded-full flex items-center justify-center">
                         <span class="text-2xl font-bold">+</span>
                       </button>
                     </div>
                   </div>
 
                 </div>
-                <p class="text-center text-primary font-semibold">
+                <p class="text-center text-primary-500 font-semibold">
                     {rubrica.model_name ? rubrica.model_name : "Modelo Temporariamente Não-Nomeado"}
                 </p>
               </div>
             {/each}
             <div class="flex flex-col h-44 w-[25vw] mb-2">
-              <div class="bg-secondary h-32 m-3 rounded-lg shadow-md hover-up">
+              <div class="bg-secondary-500 dark:bg-dark-secondary h-32 m-3 rounded-lg shadow-md hover-up">
                 <div class="flex justify-end items-end m-4 inset-0">
                   <div class="mt-12">
-                    <button on:click={criarNovaRubrica} class="bg-primary text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg">
+                    <button on:click={criarNovaRubrica} class="bg-primary-500 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg">
                       <span class="text-2xl font-bold">+</span>
                     </button>
                   </div>
                 </div>
 
               </div>
-              <p class="text-center text-primary font-semibold">
+              <p class="text-center text-primary-500 font-semibold">
                   Crie seu próprio modelo personalizado
               </p>
             </div>
