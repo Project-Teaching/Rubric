@@ -1,6 +1,8 @@
 <script>
   import { page } from '$app/stores';
   import { derived } from 'svelte/store';
+  // @ts-ignore
+  import IoMdHome from 'svelte-icons/io/IoMdHome.svelte';
 
   // Função para gerar breadcrumbs a partir da URL
   /**
@@ -36,10 +38,11 @@
 
   // Função para verificar se o segmento parece ser um ID
   /**
-     * @param {string} segment
+     * @param {string | any[]} segment
      */
   function isId(segment) {
     // Ajuste a lógica conforme necessário para identificar IDs
+    // @ts-ignore
     return segment.length === 20 && /^[A-Za-z0-9]+$/.test(segment); // Exemplo para IDs do Firebase
   }
 
@@ -47,17 +50,20 @@
   const breadcrumbs = derived(page, $page => generateBreadcrumbs($page.url.pathname));
 </script>
 
-<div class="breadcrumbs text-sm ml-3">
-  <ul>
-    <li><a href="/">Home</a></li>
-    {#each $breadcrumbs as { segment, href, isCurrent }}
-      <li class={isCurrent ? 'text-neutral font-bold' : ''}>
-        {#if isCurrent}
-          {segment}
-        {:else}
-          <a href={href}>{segment}</a>
-        {/if}
-      </li>
-    {/each}
-  </ul>
-</div>
+<ol class="breadcrumb mt-2">
+  <li class="crumb">
+    <a href="/">
+      <div class="ml-2 w-6"><IoMdHome /> </div><!-- Ícone da home -->
+    </a>
+  </li>
+  {#each $breadcrumbs as { segment, href, isCurrent }}
+    <li class="crumb-separator" aria-hidden="true">&rsaquo;</li>
+    <li class="crumb">
+      {#if isCurrent}
+        <p class="anchor no-underline font-bold">{segment}</p>
+      {:else}
+        <a class="font-bold" href={href}>{segment}</a>
+      {/if}
+    </li>
+  {/each}
+</ol>

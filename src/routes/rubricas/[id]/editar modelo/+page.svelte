@@ -13,7 +13,7 @@
     <title>Editar Rubrica</title>
   </svelte:head>
   
-  <main class="flex flex-col min-h-screen">
+  <main class="flex flex-col min-h-screen dark:bg-dark-surface">
     <NavBar></NavBar>
     <Breadcrumbs />
     <div class="flex-grow main-content">
@@ -21,7 +21,7 @@
         <input id="my-drawer" type="checkbox" class="drawer-toggle" />
         <div class="drawer-content">
           <div class="h-2 flex justify-center">
-            <h1 class="text-2xl font-bold text-primary">Editar Rubrica</h1>
+            <h1 class="text-2xl font-bold text-primary-500">Editar Rubrica</h1>
           </div>
           
           {#if data.docId}
