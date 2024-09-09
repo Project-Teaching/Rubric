@@ -150,14 +150,14 @@
   
   <!-- Modal de confirmação -->
   <dialog id="confirm_modal" class="modal">
-    <div class="modal-box">
+    <div class="modal-box bg-secondary-500 dark:bg-dark-surface p-2">
       <h3 class="text-lg font-bold">Confirmar Exclusão</h3>
       <p class="py-4">Você tem certeza que deseja remover esta rubrica? Esta ação não pode ser desfeita.</p>
       <div class="modal-action">
-        <button on:click={removerRubrica} class="btn btn-error">Excluir</button>
+        <button on:click={removerRubrica} class="btn variant-filled-error dark:bg-error-500">Excluir</button>
         <form method="dialog">
           <!-- if there is a button in form, it will close the modal -->
-          <button class="btn btn-secondary">Cancelar</button>
+          <button class="btn bg-secondary-200 dark:bg-dark-secondary">Cancelar</button>
         </form>
       </div>
     </div>

@@ -1,7 +1,9 @@
 <script lang="ts">
     import { user, userData } from "$lib/firebase";
-     import "../app.css";
- 
+    import "../app.css";
+    import { initializeStores, Toast } from '@skeletonlabs/skeleton';
+
+    initializeStores();
  
     $user;
     $userData; 

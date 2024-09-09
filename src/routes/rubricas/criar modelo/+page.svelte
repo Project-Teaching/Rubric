@@ -21,7 +21,7 @@
   <title>Rubric App</title>
 </svelte:head>
 
-    <main class="flex flex-col min-h-screen">
+    <main class="flex flex-col min-h-screen dark:bg-dark-surface">
       <NavBar></NavBar>
       <Breadcrumbs />
       <div class="flex-grow main-content">

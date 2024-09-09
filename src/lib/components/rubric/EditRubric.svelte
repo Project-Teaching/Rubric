@@ -197,7 +197,7 @@
     rubric.update((r) => {
       if (r) {
         // Define o estado inicial
-        const initialPerformanceLevels = Array.from({ length: 4 }, (_, i) => ({
+        const initialPerformanceLevels = Array.from({ length: 5 }, (_, i) => ({
           name: `Level ${i + 1}`,
           value: i + 1
         }));
@@ -221,44 +221,6 @@
     });
   }
   // CONTROLADORES DO GRID - END
-  // CONTROLADORES DAS TAGS - START
-  // Função para adicionar uma tag ao campo específico (course/major)
-  function addTag(field: string, tag: string) {
-      rubric.update((r) => {
-          if (r) {
-            // @ts-ignore
-              if (!r[field]) {
-                // @ts-ignore
-                  r[field] = []; // Inicializar o array se estiver vazio
-              }
-              // @ts-ignore
-              if (!r[field].includes(tag)) {
-                // @ts-ignore  
-                r[field].push(tag); // Adicionar a nova tag
-                // @ts-ignore
-                saveRubricField(docId, field, r[field]); // Salvar no Firestore
-              }
-          }
-          return r;
-      });
-  }
-  // Função para remover uma tag do campo específico (course/major)
-  function removeTag(field: string, tag: string) {
-      rubric.update((r) => {
-          if (r) {
-            // @ts-ignore
-              const index = r[field].indexOf(tag);
-              if (index > -1) {
-                // @ts-ignore
-                  r[field].splice(index, 1); // Remover a tag
-                // @ts-ignore
-                  saveRubricField(docId, field, r[field]); // Salvar no Firestore
-              }
-          }
-          return r;
-      });
-  }
-  // CONTROLADORES DAS TAGS - END
 
   // CONTROLE DE DRAG AND DROP - START
   const dispatch = createEventDispatcher();
@@ -311,17 +273,6 @@
   });
 
 </script>
-
-<style>
-  .over {
-    @apply border-gray-400 scale-105;
-  }
-  
-  th {
-    max-width: 15.5vw;
-    min-width: 15.5vw;;
-  }
-</style>
 
 {#if $rubric}
   <div class="rubric-matrix m-6 bg">
@@ -409,41 +360,13 @@
       </table>
     </div>
     <div class="flex justify-start">
-       <!--<label class="input flex items-center gap-2 max-w">Cursos:
-       <input id="major" type="text" class="grow bg-secondary p-1 text-lg rounded-md max-h-7"
-        on:keydown={(e) => e.key === 'Enter' && handleFieldChange('major', e.target?.value)} />
-      </label>-->
       <div class="w-max m-2">
-        <TagAutoComplete />
+        Cursos:
+        <TagAutoComplete docId={docId} field={"major"} />
       </div>
       <div class="w-max m-2">
-        <TagAutoComplete />
-      </div>
-      <!--<<label class="input flex items-center gap-2 max-w">Disciplinas:
-        <input id="course" type="text" class="grow bg-secondary p-1 text-lg rounded-md max-h-7"
-        on:keydown={(e) => e.key === 'Enter' && handleFieldChange('course', e.target?.value)} />
-      </label>-->
-    </div>
-    <div class="flex justify-between">
-      <div class="flex justify-center items-center flex-col">      
-        <div class="flex">
-          <p class="font-bold mb-2">Cursos</p>
-        </div>
-        <div class="flex flex-wrap items-center justify-center max-w-[15vw]">
-          {#each $rubric?.major ?? [] as major}
-          <button  class="btn btn-primary text-xs text-base-100 font-bold p-1.5 m-1 rounded-xl cursor-pointer" on:click={() => removeTag('major', major)}>{major}</button>
-          {/each}
-        </div>
-      </div>
-      <div class="flex flex-col justify-center items-center">      
-        <div class="flex">
-          <p class="font-bold mb-2">Disciplinas</p>
-        </div>
-        <div class="flex flex-wrap items-center justify-center max-w-[10vw]">
-          {#each $rubric?.course ?? [] as course}
-          <button class="btn btn-primary text-xs text-base-100 font-bold p-1.5 m-1 rounded-xl cursor-pointer" on:click={() => removeTag('course', course)}>{course}</button>
-          {/each}
-        </div>
+        Disciplinas:
+        <TagAutoComplete docId={docId} field={"course"}/>
       </div>
     </div>
 
@@ -466,3 +389,24 @@
 {:else}
   <p>Carregando rubrica...</p>
 {/if}
+
+
+<style>
+  .over {
+    @apply border-gray-400 scale-105;
+  }
+  
+  th {
+    max-width: 15.5vw;
+    min-width: 15.5vw;;
+  }
+
+  .hover-up {
+      transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  }
+
+  .hover-up:hover {
+      transform: scale(1.01);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+</style>
