@@ -14,19 +14,20 @@ export const load = async ({ locals }) => {
     // Cria uma rubrica em branco
     const blankRubric = {
         model_name: '',
-        course: Array(1).fill('Basis Tag'),
-        major: Array(1).fill('Basis Tag'),
+        course: Array(1).fill('#TAG'),
+        major: Array(1).fill('#TAG'),
         uid,
         criteria: [
-            { name: 'Critério 1', descriptors: Array(4).fill('') },
-            { name: 'Critério 2', descriptors: Array(4).fill('') },
-            { name: 'Critério 3', descriptors: Array(4).fill('') }
+            { name: 'Critério 1', descriptors: Array(5).fill('') },
+            { name: 'Critério 2', descriptors: Array(5).fill('') },
+            { name: 'Critério 3', descriptors: Array(5).fill('') }
         ],
         performance_levels: [
             { name: 'Level 1', value: 1 },
             { name: 'Level 2', value: 2 },
             { name: 'Level 3', value: 3 },
-            { name: 'Level 4', value: 4 }
+            { name: 'Level 4', value: 4 },
+            { name: 'Level 5', value: 5 }
         ]
     };
 
