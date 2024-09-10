@@ -3,25 +3,32 @@ import { error, json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
 export const POST: RequestHandler = async ({ request, cookies }) => {
+    try {
+        const { idToken } = await request.json();
 
-    const { idToken } = await request.json();
+        if (!idToken) {
+            throw error(400, 'ID Token is required');
+        }
 
-    const expiresIn = 60 * 60 * 24 * 5 * 1000; // 5 days
+        const expiresIn = 60 * 60 * 24 * 5 * 1000; // 5 days
+        const decodedIdToken = await adminAuth.verifyIdToken(idToken);
+        
+        console.log('Decoded ID Token:', decodedIdToken); // Adicione logs para verificar o token
 
-    const decodedIdToken = await adminAuth.verifyIdToken(idToken);
+        if (Math.floor(Date.now() / 1000) - decodedIdToken.auth_time < 5 * 60) {
+            const cookie = await adminAuth.createSessionCookie(idToken, { expiresIn });
+            const options = { maxAge: expiresIn, httpOnly: true, secure: process.env.NODE_ENV === 'production', path: '/' };
+            // -- OPTIONS PARA QUANDO ESTIVER EM PRODUÇÃO const options = { maxAge: expiresIn, httpOnly: true, secure: true, path: '/' };
+            cookies.set('__session', cookie, options);
 
-    if (new Date().getTime() / 1000 - decodedIdToken.auth_time < 5 * 60) {
-        const cookie = await adminAuth.createSessionCookie(idToken, { expiresIn });
-        const options = { maxAge: expiresIn, httpOnly: true, secure: true, path: '/' };
-
-        cookies.set('__session', cookie, options);
-
-        return json({ status: 'signedIn' });
-    } else {
-        throw error(401, 'Recent sign in required!');
+            return json({ status: 'signedIn' });
+        } else {
+            throw error(401, 'Recent sign in required!');
+        }
+    } catch (err) {
+        console.error('Sign in error:', err);
+        throw error(500, 'Internal Server Error');
     }
-
-
 };
 
 export const DELETE: RequestHandler = async ({ cookies }) => {
