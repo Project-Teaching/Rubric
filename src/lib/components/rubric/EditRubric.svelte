@@ -5,6 +5,8 @@
   import { writable } from 'svelte/store';
   import { createEventDispatcher } from "svelte";
   import TagAutoComplete from '../TagAutoComplete.svelte';
+  // @ts-ignore
+  import IoMdTrash from 'svelte-icons/io/IoMdTrash.svelte'
 
   interface Criterion {
     name: string;
@@ -28,6 +30,7 @@
   let descriptorIndex: number | null = null;
   let criterionIndex: number | null = null;
   let isOver: number | null = null;
+  let linhaRemover: number | null = null; // Variável global para armazenar a linha a ser removida
 
   // Função para abrir o modal de edição de descritor
   function openEditModal(cIndex: number, dIndex: number) {
@@ -39,6 +42,43 @@
     }
     // @ts-ignore
     document.getElementById('edit_modal')?.showModal();
+  }
+
+
+  // Função para abrir o modal de exclusão
+  function openDeletRowModal(row: number) {
+    linhaRemover = row; // Armazena a linha a ser removida
+    const modal = document.getElementById('row_confirm_modal');
+    if (modal) {
+      // Exibe o modal de confirmação
+      // @ts-ignore
+      modal.showModal();
+    }
+  }
+
+  // Função para confirmar e remover a linha
+  function confirmRemoveRow() {
+    if (linhaRemover !== null) {
+      // Remove a linha do índice armazenado
+      removeCriterion(linhaRemover);
+
+      // Fecha o modal de confirmação
+      // @ts-ignore
+      document.getElementById('row_confirm_modal')?.close();
+      
+      // Limpa a variável após a remoção
+      linhaRemover = null;
+    }
+  }
+
+  // Função para cancelar a exclusão e fechar o modal
+  function cancelRemoveRow() {
+    // Fecha o modal de confirmação
+    // @ts-ignore
+    document.getElementById('row_confirm_modal')?.close();
+
+    // Limpa a variável, já que a remoção foi cancelada
+    linhaRemover = null;
   }
 
   // Função para salvar o descritor
@@ -279,7 +319,7 @@
     <div class="flex justify-between mb-4">
       <div>
         <button class="btn variant-filled-primary ml-2" on:click={addCriterion}>Linha +</button>
-        <button class="btn variant-filled-secondary" on:click={() => removeCriterion($rubric.criteria.length - 1)}>Linha -</button>
+        <button class="btn variant-filled-secondary mr-2" on:click={() => removeCriterion($rubric.criteria.length - 1)}>Linha -</button>
       </div>
       <div>
         <button class="btn variant-filled-error hover-up ml-2 mt-2" on:click={resetGrid}>Limpar Grid</button>
@@ -289,9 +329,9 @@
         <button class="btn variant-filled-secondary mr-2" on:click={() => removePerformanceLevel($rubric.performance_levels.length - 1)}>Coluna -</button>
       </div>
     </div>
-    <div class="flex justify-start w-20">
-      <label class="input dark:bg-dark-surface border-none flex items-center gap-2 max-w">
-        Nome da Avaliação:
+    <div class="flex justify-start">
+      <label class="input dark:bg-dark-surface border-none flex items-center gap-2 w-[20%]">
+        Nome do Modelo:
         <input id="model_name"  type="text" class="grow bg-secondary-500 dark:bg-dark-secondary p-1 text-lg rounded-md max-h-7" value={$rubric.model_name}  on:keydown={(e) => e.key === 'Enter' && handleFieldChange('model_name', e.target?.value)} />
       </label>
     </div>
@@ -299,6 +339,7 @@
       <table class="table-fixed border-collapse mt-5">
         <thead class="table-header-group bg-secondary-500 dark:bg-dark-secondary text-md">
           <tr>
+            <th class="drag-drop-row-cell border border-tertiary-500 border-solid"></th>
             <th class="border border-tertiary-500 border-solid">Critério</th>
             {#each $rubric.performance_levels as level}
               <th class="border border-tertiary-500 border-solid p-4">
@@ -324,14 +365,29 @@
           {#each $rubric.criteria as criterion, cIndex}
             <tr
             class="transition-all"
-            class:over={cIndex === isOver}
-            data-index={cIndex}
-            data-id={cIndex}
-            draggable="true"
-            on:dragstart={onDragStart}
-            on:dragover|preventDefault={onDragOver}
-            on:drop={onDrop}
             >
+              <td class="drag-drop-row-cell border border-tertiary-500 border-solid bg-secondary-500 dark:bg-dark-secondary" 
+              class:over={cIndex === isOver}
+              data-index={cIndex}
+              data-id={cIndex}
+              draggable="true"
+              on:dragstart={onDragStart}
+              on:dragover|preventDefault={onDragOver}
+              on:drop={onDrop}>
+                <div class="indicator cursor-grab">
+                  <div class="indicator-item indicator-bottom indicator-start">
+                    <div class="hover:text-error-500 w-5 mt-9 ml-3.5"
+                    role="button"
+                    tabindex="0"
+                    on:click={() => openDeletRowModal(cIndex)}
+                    on:keydown={(e) => e.key === 'Enter' && openDeletRowModal(cIndex)}
+                    aria-label="Remover Linha">
+                      <IoMdTrash /> 
+                    </div>
+                  </div>
+                  <span class="text-xl font-semibold text-center text-black dark:text-white cursor-grab">≡</span>
+                </div>
+              </td> <!-- Ícone de drag-and-drop -->
               <td class="border border-tertiary-500 border-solid p-2">
                 <input 
                   class="grow bg-secondary-500 dark:bg-dark-secondary p-1 text-lg rounded-md max-h-7 text-center font-medium"
@@ -385,6 +441,21 @@
       </div>
     </dialog>
 
+      <!-- Modal de confirmação -->
+      <dialog id="row_confirm_modal" class="modal">
+        <div class="modal-box bg-secondary-500 dark:bg-dark-surface p-2">
+          <h3 class="text-lg font-bold">Confirmar Exclusão</h3>
+          <p class="py-4">Você tem certeza que deseja remover esta linha? Esta ação não pode ser desfeita.</p>
+          <div class="modal-action">
+            <button class="btn variant-filled-error" on:click={confirmRemoveRow}>Confirmar</button>
+            <form method="dialog">
+              <!-- if there is a button in form, it will close the modal -->
+              <button class="btn bg-secondary-200 dark:bg-dark-secondary" on:click={cancelRemoveRow}>Cancelar</button>
+            </form>
+          </div>
+        </div>
+      </dialog>
+
   </div>
 {:else}
   <p>Carregando rubrica...</p>
@@ -397,8 +468,8 @@
   }
   
   th {
-    max-width: 15.5vw;
-    min-width: 15.5vw;;
+    max-width: 15.4vw;
+    min-width: 15.4vw;;
   }
 
   .hover-up {
@@ -408,5 +479,11 @@
   .hover-up:hover {
       transform: scale(1.01);
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .drag-drop-row-cell{
+    max-width: 2.5rem;
+    min-width: 2.5rem;
+
   }
 </style>
