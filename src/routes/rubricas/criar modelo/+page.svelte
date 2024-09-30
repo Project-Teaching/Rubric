@@ -18,7 +18,7 @@
 </script>
 
 <svelte:head>
-  <title>Rubric App</title>
+  <title>Rubric Pro</title>
 </svelte:head>
 
     <main class="flex flex-col min-h-screen dark:bg-dark-surface">
