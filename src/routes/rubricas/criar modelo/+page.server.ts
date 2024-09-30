@@ -1,6 +1,4 @@
-import type { PageServerLoad, Actions } from './$types';
-import { adminDB } from '$lib/server/admin';
-import { error, redirect } from '@sveltejs/kit';
+import { redirect } from '@sveltejs/kit';
 import { addDoc, collection } from 'firebase/firestore';
 import { db } from '$lib/firebase';
 
