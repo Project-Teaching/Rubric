@@ -4,22 +4,36 @@
   import Footer from "$lib/components/Footer.svelte";
   import Breadcrumbs from "$lib/components/Breadcrumbs.svelte";
   import Drawer from '$lib/components/Drawer.svelte';
-  import { goto } from '$app/navigation';
-  import { doc, deleteDoc } from 'firebase/firestore';
-  import { db } from '$lib/firebase'; // Ajuste o caminho conforme sua configuração
+  import CoursesCard from '$lib/components/majors/CoursesCard.svelte';
+  import { Accordion, AccordionItem } from '@skeletonlabs/skeleton';
+  // @ts-ignore
+  import IoIosArrowDown from 'svelte-icons/io/IoIosArrowDown.svelte'
+  // @ts-ignore
+  import IoIosArrowUp from 'svelte-icons/io/IoIosArrowUp.svelte'
 
-  let rubricas: { 
-        id: string, uid: string, major: string, course: string, performance_levels:any[], criteria: any[], model_name: string
+  let majors: { 
+        id:string, major_id: string, major_name: string, major_courses: courses[] 
       }[]; 
+  
+  let classes: { 
+        id: string, course_id: string, course_semester: number, course_year: number
+      }[];
 
-  let rubricaParaRemover: string | null = null;
+  interface courses { 
+        c_id: string, c_name: string
+      }
 
   $: {
-    if ($page.data && $page.data.rubricas) {
-      rubricas = $page.data.rubricas;
+    if ($page.data && $page.data.majors && $page.data.classes) {
+      majors = $page.data.majors;
+      classes = $page.data.classes;
     }
   }
 
+  // Função para encontrar a turma correspondente de um curso
+  const getCourseDetails = (courseId: string) => {
+    return classes.find(cls => cls.course_id === courseId);
+  }
 </script>
 
 <svelte:head>
@@ -38,33 +52,39 @@
           <h1 class="text-2xl font-bold text-primary-500">Cursos e Disciplinas</h1>
         </div>
         <section class="container mx-auto mt-10">
-          <!-- svelte-ignore a11y-missing-content -->
-          <h1 class="text-3xl font-bold mb-5 text-center"></h1>
-          {#if rubricas?.length === 0}
+          {#if majors?.length === 0}
             <p class="text-center mb-10">
-              Parece que você não tem nenhuma rubrica de avaliação criada ainda!
-              <br />
-              Logo abaixo você verá alguns modelos de nosso sistema, ou poderá criar sua rubrica do zero!
+              Parece que ainda não tem nenhum curso e disciplina ligados a você!
             </p>
           {/if}
-          <div class="flex flex-wrap gap-8">
-            {#each rubricas as rubrica (rubrica.id)}
-              <div class="flex flex-col h-44 w-[25vw] mb-2">
-                <div class="bg-secondary-500 dark:bg-dark-secondary h-32 m-3 rounded-lg shadow-md hover-up">
-                  <div class="flex m-4 inset-0 h-full">
-                    <div class="text-bg-200 font-bold p-2 rounded mb-2 w-4/5 h-min">
-                      N° de Curso(s): 3 <br/>
-                      N° de Disciplina(s): 15 <br/>
-                      N° de Avaliações: 20
-                    </div>
-                  </div>
-
+          <Accordion>
+          {#each majors as major (major.id)}
+            <AccordionItem open>
+              <svelte:fragment slot="iconClosed"><div class="w-5 text-primary-500"><IoIosArrowUp /></div></svelte:fragment>
+	            <svelte:fragment slot="iconOpen"><div class="w-5 text-primary-500"><IoIosArrowDown /></svelte:fragment>
+              <svelte:fragment slot="summary"><h3 class="text-primary-500 font-semibold mb-2 text-lg">{major.major_name}</h3></svelte:fragment>
+              <svelte:fragment slot="content">
+                <div class="flex flex-wrap gap-8">
+                  <hr class="!border-t-2 !border-primary-400 w-full" />
+                  {#each major.major_courses as course}
+                    {#if getCourseDetails(course.c_id)}
+                      <!-- Atribui os detalhes do curso -->
+                      {#await getCourseDetails(course.c_id) then courseDetails}
+                        <CoursesCard 
+                          course_name={course.c_name} 
+                          major_name={major.major_name} 
+                          course_semester={courseDetails?.course_semester} 
+                          course_year={courseDetails?.course_year}
+                          class_id={courseDetails?.id} 
+                        />
+                      {/await}
+                    {/if}
+                  {/each}
                 </div>
-                <p class="text-center text-primary-500 font-semibold">
-                    {rubrica.model_name ? rubrica.model_name : "Modelo Temporariamente Não-Nomeado"}
-                </p>
-              </div>
-            {/each}
+              </svelte:fragment>
+            </AccordionItem>
+          {/each}  
+          </Accordion>      
         </section>
       </div>
       <Drawer></Drawer>
@@ -74,13 +94,5 @@
 </main>
 
 <style>
-  .hover-up {
-      transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-  }
-
-  .hover-up:hover {
-      transform: scale(1.01);
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  }
 
 </style>
