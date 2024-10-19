@@ -9,7 +9,7 @@
   import { db } from '$lib/firebase'; // Ajuste o caminho conforme sua configuração
 
   let rubricas: { 
-        id: string, uid: string, major: string, course: string, performance_levels:any[], criteria: any[], model_name: string
+        id: string, uid: string, major: string, course: string, performance_levels:any[], criteria: any[], model_name: string, version: number, public: boolean, original_model: string, finished: boolean
       }[]; 
 
   let rubricaParaRemover: string | null = null;
