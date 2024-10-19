@@ -25,6 +25,7 @@
     uid: string;
     criteria: Criterion[];
     performance_levels: PerformanceLevel[];
+    public: boolean;
   }
   export let docId: string;
   let rubric = writable<Rubric | null>(null);

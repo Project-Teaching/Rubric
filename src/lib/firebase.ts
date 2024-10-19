@@ -106,10 +106,11 @@ interface PerformanceLevel {
 }
 
 interface Rubric {
-  avaliation_name: string;
-  course: string;
-  major: string;
+  model_name: string;
+  course: string[];
+  major: string[];
   uid: string; // Assuming uid is a string. Adjust the type as necessary.
   criteria: Criterion[];
   performance_levels: PerformanceLevel[];
+  public: boolean;
 }
