@@ -27,7 +27,10 @@ export const load = async ({ locals }) => {
             { name: 'Level 4', value: 4 },
             { name: 'Level 5', value: 5 }
         ],
-        public: false
+        public: false,
+        finished: false,
+        version: 1,
+        original_model: ''
     };
 
     // Adiciona a rubrica ao Firestore

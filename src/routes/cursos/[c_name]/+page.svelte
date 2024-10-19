@@ -5,6 +5,7 @@
   import NavBar from '$lib/components/NavBar.svelte';
   import Drawer from '$lib/components/Drawer.svelte';
   import { SlideToggle, ProgressBar } from '@skeletonlabs/skeleton';
+  
   // @ts-ignore
   import FaRegListAlt from 'svelte-icons/fa/FaRegListAlt.svelte'
   // @ts-ignore
@@ -21,7 +22,7 @@
         evaluation_id: string, evaluation_name: string, evaluation_date: string, evaluation_major: string, evaluation_course: string, class_id: string, professor_id: string, rubric_model_id: string, evaluation_result: evaluation_results[]
       }[];
   let models: {
-        rubric_id: string, model_name: string
+        rubric_id: string, model_name: string, version: number
   }[];
 
   interface evaluation_results {
@@ -108,13 +109,13 @@
                           <button class="w-5 h-5 text-primary-500 hover:text-primary-300 mr-3">
                             <FaRegListAlt/>
                           </button>
-                          <button class="w-5 h-5 text-green-400 hover:text-green-200 mr-3">
+                          <button class="w-5 h-5 text-green-600 dark:text-green-400 hover:text-green-400 dark:hover:text-green-200 mr-3">
                             <FaEye/>
                           </button>
                           <button class="w-5 h-5 text-red-700 hover:text-red-500 mr-3">
                             <FaTrashAlt/>
                           </button>
-                          <button class="w-5 h-5 text-cyan-400 hover:text-cyan-200">
+                          <button class="w-5 h-5 text-cyan-600 dark:text-cyan-400 hover:text-cyan-400 dark:hover:text-cyan-200">
                             <FaBell/>
                           </button>
                         </div>
@@ -126,22 +127,16 @@
                     </tr>
                     {/await}
                   {/each}
-                  <tr>
-                    <td>a</td>
-                    <td>a</td>
-                    <td>a</td>
-                    <td>a</td>
-                  </tr>
                 </tbody>
                 <tfoot>
                   <tr class="bg-secondary-500 dark:bg-dark-secondary">
                     <th colspan="2">Adicionar Nova Avaliação</th>
                     <td colspan="2">
-                      <form action="./{course_name}/nova avaliação" method="post">
+                      <form action="./{course_name}/nova avaliação" method="get">
                         <input type="hidden" name="class_id" value={class_id}>
                         <select class="select border-none w-[70%] bg-gray-100 dark:bg-stone-800 rounded-md p-2 mr-2" name="rubric_model_id">
                           {#each models as model}
-                            <option value={model.rubric_id}>{model.model_name}</option>
+                            <option value={model.rubric_id}>{model.model_name} V. {model.version}</option>
                           {/each}
                         </select>
                         <button class="btn bg-primary-500 font-semibold" type="submit">Selecionar</button>
