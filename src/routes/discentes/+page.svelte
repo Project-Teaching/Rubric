@@ -101,7 +101,7 @@
     <div class="drawer">
       <input id="my-drawer" type="checkbox" class="drawer-toggle" />
       <div class="drawer-content">
-        <!-- Conteúdo principal aqui -->
+     <!-- Conteúdo principal aqui -->
         <div class="h-2 flex justify-center text-center"> <!-- Bloco de Texto Principal 1 -->
           <h1 class="text-2xl font-bold text-primary-500">Adicionar Alunos via CSV</h1>
         </div>
@@ -118,7 +118,7 @@
             <!-- Botão para redirecionar para o formulário de cadastro manual -->
             <button
               on:click={irParaFormulario}
-              class="btn variant-filled-primary"
+              class="btn variant-filled-primary mt-12"
             >
               Adicionar via Formulário
             </button>
