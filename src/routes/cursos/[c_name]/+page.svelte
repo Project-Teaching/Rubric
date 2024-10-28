@@ -19,7 +19,7 @@
         course_id: string, course_semester: number, course_year: number, professors: any[], students: any[]
       };
   let evaluations: { 
-        evaluation_id: string, evaluation_name: string, evaluation_date: string, evaluation_major: string, evaluation_course: string, class_id: string, professor_id: string, rubric_model_id: string, evaluation_result: evaluation_results[]
+        evaluation_id: string, evaluation_name: string, evaluation_date: string, evaluation_major: string, evaluation_course: string, class_id: string, professor_id: any[], rubric_model_id: string, evaluation_result: evaluation_results[]
       }[];
   let models: {
         rubric_id: string, model_name: string, version: number

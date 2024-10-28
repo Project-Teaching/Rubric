@@ -9,58 +9,65 @@ export const load: PageServerLoad = async ({ locals, url, params }) => {
   const uid = locals.userID;
 
   if (class_id) {
+    // Obtenha o documento da turma pelo class_id
     const classDoc = await adminDB.collection('classes').doc(class_id).get();
 
-    // Verifica se o documento existe
+    // Verifica se o documento da turma existe
     if (classDoc.exists) {
-        //console.log(classDoc.id, '=>', classDoc.data());
-        const classData = classDoc.data();
+      const classData = classDoc.data();
 
+      // Verifica se o professor está na lista de professores da turma
+      if (classData?.professors && classData?.professors.includes(uid)) {
+        // Busca as avaliações pelo class_id e ordena por data
         const evaluationsSnapshot = await adminDB.collection('evaluations')
-        .where('class_id', '==', class_id)
-        .where('professor_id', '==', uid)
-        .get();
+          .where('class_id', '==', class_id)
+          .orderBy('evaluation_date', 'asc')
+          .get();
 
         const evaluationsData = evaluationsSnapshot.docs.map(doc => {
-        const data = doc.data();
-      
-        // Converte o evaluation_date para uma string ISO, se for um Timestamp
-        const evaluation_date = (data.evaluation_date instanceof Timestamp)
-              ? data.evaluation_date.toDate().toLocaleDateString('pt-BR')  // Converte para string serializável
-              : data.evaluation_date;
-      
-        return { 
-              id: doc.id, 
-              ...data,
-              evaluation_date // Garantindo que este campo seja serializável
+          const data = doc.data();
+        
+          // Converte o evaluation_date para uma string ISO, se for um Timestamp
+          const evaluation_date = (data.evaluation_date instanceof Timestamp)
+            ? data.evaluation_date.toDate().toLocaleDateString('pt-BR')  // Converte para string serializável
+            : data.evaluation_date;
+        
+          return { 
+            id: doc.id, 
+            ...data,
+            evaluation_date // Garantindo que este campo seja serializável
           };
         });
 
+        // Carrega os modelos de rubricas do professor
         const rubricsSnapshot = await adminDB.collection('rubrics')
-        .where('uid', '==', uid)
-        .get();
+          .where('uid', '==', uid)
+          .get();
 
         const rubricsData = rubricsSnapshot.docs.map(doc => {
-            const data = doc.data();
-            return { 
-                rubric_id: doc.id, 
-                model_name: data.model_name,
-                version: data.version
-            };
+          const data = doc.data();
+          return { 
+            rubric_id: doc.id, 
+            model_name: data.model_name,
+            version: data.version
+          };
         });
 
         return {
-            course_name,
-            classes: classData,
-            evaluations: evaluationsData,
-            models: rubricsData,
-            class_id
+          course_name,
+          classes: classData,
+          evaluations: evaluationsData,
+          models: rubricsData,
+          class_id
         };
+      } else {
+        console.log('O professor não está designado para a turma especificada.');
+      }
     } else {
-        console.log('Nenhuma turma encontrada para o class_id fornecido.');
+      console.log('Nenhuma turma encontrada para o class_id fornecido.');
     }
   } else {
-        console.log('class_id não encontrado no Params da página.');
+    console.log('class_id não encontrado no Params da página.');
   }
 };
 
@@ -70,8 +77,9 @@ export const actions: Actions = {
 
     const class_id = formData.get('class_id') as string;
     const rubric_model_id = formData.get('rubric_model_id') as string;
-    const professor_id = formData.get('professor_id') as string;
+    //const professor_id = formData.get('professor_id') as string;
     const evaluation_name = formData.get('evaluation_name') as string;
+    const group_evaluation  = formData.get('group_evaluation') === 'true'; // Converte para boolean
 
     const evaluation_date_input = formData.get('evaluation_date') as string;
     const evaluation_date = new Date(evaluation_date_input); // Converte para Date
@@ -97,18 +105,21 @@ export const actions: Actions = {
     const evaluation_major = formData.get('evaluation_major') as string;
     const evaluation_course = formData.get('evaluation_course') as string;
 
+
     try {
       // Salvar a avaliação no banco de dados
       const newEvaluation = {
         class_id,
         rubric_model_id,
-        professor_id,
         evaluation_name,
         evaluation_date: evaluation_date_utc,
         evaluation_major,
+        group_evaluation,
         evaluation_course,
         evaluation_result: [
-            { evaluation_comments: '', evaluation_notes: '', group_id: '', student_id: '', score: 0 },
+            { evaluation_comments: '', evaluation_notes: '', group_id: '', student_id: '', score: 0, professor_id: locals.userID, 
+              rubric_evaluatiion: [ { criterion_number: 1, level_number: 2 }, { criterion_number: 2, level_number: 3 } ]
+             },
         ]
       };
 
