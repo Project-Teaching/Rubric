@@ -4,6 +4,7 @@
   import Footer from "$lib/components/Footer.svelte";
   import Breadcrumbs from "$lib/components/Breadcrumbs.svelte";
   import Drawer from '$lib/components/Drawer.svelte';
+  import Modal from '$lib/components/Modal.svelte';
   import { goto } from '$app/navigation';
   import { doc, deleteDoc } from 'firebase/firestore';
   import { db } from '$lib/firebase'; // Ajuste o caminho conforme sua configuração
@@ -148,20 +149,7 @@
   </div>
   <Footer></Footer>
   
-  <!-- Modal de confirmação -->
-  <dialog id="confirm_modal" class="modal">
-    <div class="modal-box bg-secondary-500 dark:bg-dark-surface p-2">
-      <h3 class="text-lg font-bold">Confirmar Exclusão</h3>
-      <p class="py-4">Você tem certeza que deseja remover esta rubrica? Esta ação não pode ser desfeita.</p>
-      <div class="modal-action">
-        <button on:click={removerRubrica} class="btn variant-filled-error dark:bg-error-500">Excluir</button>
-        <form method="dialog">
-          <!-- if there is a button in form, it will close the modal -->
-          <button class="btn bg-secondary-200 dark:bg-dark-secondary">Cancelar</button>
-        </form>
-      </div>
-    </div>
-  </dialog>
+  <Modal modalId={"confirm_modal"} modalFunction={removerRubrica} modalTitle="Confirmar Exclusão" modalMessage="Você tem certeza que deseja remover esta rubrica? Esta ação não pode ser desfeita." modalButton="Excluir" />
 </main>
 
 <style>

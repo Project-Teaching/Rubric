@@ -9,6 +9,7 @@
   import IoMdTrash from "svelte-icons/io/IoMdTrash.svelte";
   // @ts-ignore
   import IoMdRefreshCircle from 'svelte-icons/io/IoMdRefreshCircle.svelte'
+    import Modal from "../Modal.svelte";
 
   interface Criterion {
     name: string;
@@ -669,76 +670,11 @@
       </div>
     </dialog>
 
-    <!-- Modal de confirmação da linha -->
-    <dialog id="row_confirm_modal" class="modal">
-      <div class="modal-box bg-secondary-500 dark:bg-dark-surface p-2">
-        <h3 class="text-lg font-bold">Confirmar Exclusão</h3>
-        <p class="py-4">
-          Você tem certeza que deseja remover esta linha? Esta ação não pode ser
-          desfeita.
-        </p>
-        <div class="modal-action">
-          <button class="btn variant-filled-error" on:click={confirmRemoveRow}
-            >Confirmar</button
-          >
-          <form method="dialog">
-            <!-- if there is a button in form, it will close the modal -->
-            <button
-              class="btn bg-secondary-200 dark:bg-dark-secondary"
-              on:click={cancelRemoveRow}>Cancelar</button
-            >
-          </form>
-        </div>
-      </div>
-    </dialog>
+    <Modal modalId={"row_confirm_modal"} modalFunction={confirmRemoveRow} modalTitle="Confirmar Exclusão" modalMessage="Você tem certeza que deseja remover esta linha? Esta ação não pode ser desfeita." modalButton="Confirmar" />
 
-    <!-- Modal de confirmação da coluna -->
-    <dialog id="col_confirm_modal" class="modal">
-      <div class="modal-box bg-secondary-500 dark:bg-dark-surface p-2">
-        <h3 class="text-lg font-bold">Confirmar Exclusão</h3>
-        <p class="py-4">
-          Você tem certeza que deseja remover esta coluna? Esta ação não pode ser
-          desfeita.
-        </p>
-        <div class="modal-action">
-          <button class="btn variant-filled-error" on:click={confirmRemoveColumn}
-            >Confirmar</button
-          >
-          <form method="dialog">
-            <!-- if there is a button in form, it will close the modal -->
-            <button
-              class="btn bg-secondary-200 dark:bg-dark-secondary"
-              on:click={cancelRemoveColumn}>Cancelar</button
-            >
-          </form>
-        </div>
-      </div>
-    </dialog>
+    <Modal modalId={"col_confirm_modal"} modalFunction={confirmRemoveColumn} modalTitle="Confirmar Exclusão" modalMessage="Você tem certeza que deseja remover esta coluna? Esta ação não pode ser desfeita." modalButton="Confirmar" />
 
-    <!-- Modal de confirmação do Reset -->
-    <dialog id="reset_modal" class="modal">
-      <div class="modal-box bg-secondary-500 dark:bg-dark-surface p-2">
-        <h3 class="text-lg font-bold">Confirmar Limpeza</h3>
-        <p class="py-4">
-          Você tem certeza que deseja limpar a Rubrica? Esta ação não pode ser
-          desfeita. <br> Todos os dados da matriz serão perdidos e a rubrica retornará a ser 3 linhas por 5 colunas.
-        </p>
-        <div class="modal-action">
-          <button class="btn variant-filled-error" on:click={resetGrid}
-            >
-            Confirmar
-          </button>
-          <form method="dialog">
-            <!-- if there is a button in form, it will close the modal -->
-            <button
-              class="btn bg-secondary-200 dark:bg-dark-secondary"
-            >
-              Cancelar
-            </button>
-          </form>
-        </div>
-      </div>
-    </dialog>
+    <Modal modalId={"reset_modal"} modalFunction={resetGrid} modalTitle="Confirmar Limpeza" modalMessage="Você tem certeza que deseja limpar a Rubrica? Esta ação não pode ser desfeita. Todos os dados da matriz serão perdidos e a rubrica retornará a ser 3 linhas por 5 colunas." modalButton="Confirmar" />
   </div>
 {:else}
   <p>Carregando rubrica...</p>

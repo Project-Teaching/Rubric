@@ -75,6 +75,13 @@
                 <div class="flex justify-center items-center w-full p-4">
                   <TextInput input_type="text" label_name="Nome da Avaliação" input_name="evaluation_name" placeholder="Nome da Avaliação" input_value_true="" input_value_ds="" disabled="false" />
                   <TextInput input_type="date" label_name="Prazo da Avaliação" input_name="evaluation_date" placeholder="Prazo da Avaliação" input_value_true="" input_value_ds="" disabled="false" />
+                  <label class="label ml-4 w-[90%]">
+                    <span class="font-semibold">Avaliação em Grupo</span>
+                    <select class="select border-none w-[70%] bg-gray-100 dark:bg-stone-800 rounded-md p-2 mr-2" name="group_evaluation">
+                        <option value="false">Não</option>
+                        <option value="true">Sim</option>
+                    </select>
+                  </label>
                 </div>
                 <!-- INFO DA EVALUATION VISUAL/HIDDEN TRUE VALUES -->
                 <div class="flex justify-center items-center w-full p-4">
