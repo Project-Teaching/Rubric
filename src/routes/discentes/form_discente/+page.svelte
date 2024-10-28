@@ -60,31 +60,59 @@
               class="form w-[50%] h-[65vh] justify-center bg-secondary-500 dark:bg-dark-secondary p-5 rounded-xl"
               on:submit|preventDefault={handleSubmit}
             >
-              <label>
-                name:
-                <input type="text" bind:value={aluno.name} />
-              </label>
-              <label>
-                surname:
-                <input type="text" bind:value={aluno.surname} />
-              </label>
-
-              <label>
-                Matrícula:
-                <input type="text" bind:value={aluno.registration} />
-              </label>
-
-              <label>
-                Email:
-                <input type="email" bind:value={aluno.email} />
-              </label>
-              <label>
-                group:
-                <input type="text" bind:value={aluno.group} />
-              </label>
-              <button class="btn variant-filled-primary" type="submit"
-                >Adicionar Aluno</button
-              >
+              <div class="flex justify-center items-center w-full p-4">
+                <label>
+                  <span class="font-semibold">Nome</span>
+                  <input
+                    type="text"
+                    bind:value={aluno.name}
+                    class="input bg-secondary-200 dark:bg-dark-surface border-b-2 border-t-0 border-l-0 border-r-0 rounded-md w-[90%]"
+                  />
+                </label>
+                <label>
+                  <span class="font-semibold">Sobrenome</span>
+                  <input
+                    type="text"
+                    bind:value={aluno.surname}
+                    class="input bg-secondary-200 dark:bg-dark-surface border-b-2 border-t-0 border-l-0 border-r-0 rounded-md w-[90%]"
+                  />
+                </label>
+              </div>
+              <div class="flex justify-center items-center w-full p-4">
+                <label>
+                  <span class="font-semibold">Matrícula</span>
+                  <input
+                    type="text"
+                    bind:value={aluno.registration}
+                    class="input bg-secondary-200 dark:bg-dark-surface border-b-2 border-t-0 border-l-0 border-r-0 rounded-md w-[90%]"
+                  />
+                </label>
+                <label>
+                  <span class="font-semibold">Email</span>
+                  <input
+                    type="email"
+                    bind:value={aluno.email}
+                    class="input bg-secondary-200 dark:bg-dark-surface border-b-2 border-t-0 border-l-0 border-r-0 rounded-md w-[90%]"
+                  />
+                </label>
+              </div>
+              <div class="flex justify-center items-center w-full p-4">
+                <label>
+                  <span class="font-semibold">Grupo</span>
+                  <input
+                    type="text"
+                    bind:value={aluno.group}
+                    class="input bg-secondary-200 dark:bg-dark-surface border-b-2 border-t-0 border-l-0 border-r-0 rounded-md w-[90%]"
+                  />
+              
+               
+              </div>
+              <div class="flex justify-center items-center w-full p-4">
+  
+              <button class="btn variant-filled-primary center" type="submit"
+              >Adicionar Aluno</button
+            >
+          </div>
             </form>
           </div>
         </section>
