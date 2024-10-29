@@ -3,6 +3,7 @@
     <ul class="menu bg-secondary-500 dark:bg-dark-surface text-base-content min-h-full w-80 p-4 font-bold drawer-text">
       <li><a href="/rubricas/">Gerenciador de Rubricas</a></li>
       <li><a href="/cursos/">Cursos e Disciplinas</a></li>
+      <li><a href="/discentes/">Discentes</a></li>
       <li><a href="/">Modelos de Rubricas</a></li>
       <li><a href="/">Suporte</a></li>
     </ul>

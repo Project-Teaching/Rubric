@@ -53,11 +53,36 @@ export const load: PageServerLoad = async ({ locals, url, params }) => {
           };
         });
 
+                // Carrega os dados de cada estudante na turma
+        const studentIDs = classData.students || [];
+        const studentDataPromises = studentIDs.map((studentID: string) => 
+          adminDB.collection('students').doc(studentID).get()
+        );
+        const studentDocs = await Promise.all(studentDataPromises);
+
+        // Extrai os dados de cada estudante
+        const studentsData = studentDocs.map(doc => {
+          if (doc.exists) {
+            // REMOVER DEPOIS - MEDIDA TEMPORÁRIA
+            const data = doc.data();
+
+            // Remove aspas ao redor do sobrenome, se presentes
+            if (data.sobrenome) {
+              data.sobrenome = data.sobrenome.replace(/^"(.*)"$/, '$1');
+            }
+            // REMOVER DEPOIS - MEDIDA TEMPORÁRIA
+            return { id: doc.id, ...data };
+          } else {
+            return null; // Caso o documento do estudante não exista
+          }
+        }).filter(student => student !== null); // Remove estudantes que não existem
+
         return {
           course_name,
           classes: classData,
           evaluations: evaluationsData,
           models: rubricsData,
+          students: studentsData,
           class_id
         };
       } else {
