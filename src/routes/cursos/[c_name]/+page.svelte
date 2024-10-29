@@ -5,7 +5,10 @@
   import NavBar from '$lib/components/NavBar.svelte';
   import Drawer from '$lib/components/Drawer.svelte';
   import { SlideToggle, ProgressBar } from '@skeletonlabs/skeleton';
-  
+  import { goto } from '$app/navigation';
+  import { doc, deleteDoc } from 'firebase/firestore';
+  import { db } from '$lib/firebase'; // Ajuste o caminho conforme sua configuração
+
   // @ts-ignore
   import FaRegListAlt from 'svelte-icons/fa/FaRegListAlt.svelte'
   // @ts-ignore
@@ -14,15 +17,19 @@
   import FaTrashAlt from 'svelte-icons/fa/FaTrashAlt.svelte'
   // @ts-ignore
   import FaBell from 'svelte-icons/fa/FaBell.svelte'
+    import Modal from '$lib/components/Modal.svelte';
 
   let classes: { 
         course_id: string, course_semester: number, course_year: number, professors: any[], students: any[]
       };
   let evaluations: { 
-        evaluation_id: string, evaluation_name: string, evaluation_date: string, evaluation_major: string, evaluation_course: string, class_id: string, professor_id: any[], rubric_model_id: string, evaluation_result: evaluation_results[]
+        id: string, evaluation_id: string, evaluation_name: string, evaluation_date: string, evaluation_major: string, evaluation_course: string, class_id: string, professor_id: any[], rubric_model_id: string, evaluation_result: evaluation_results[]
       }[];
   let models: {
         rubric_id: string, model_name: string, version: number
+  }[];
+  let students: {
+     student_id: string, email: string, nome: string, matricula: string, sobrenome: string
   }[];
 
   interface evaluation_results {
@@ -32,6 +39,7 @@
   let course_name: string;
   let class_id: string;
   let value: boolean = false;
+  let evaluationToRemove: string | null = null;
 
   $: {
     if ($page.data) {
@@ -39,6 +47,7 @@
       course_name = $page.data.course_name; // Acesse course_name diretamente
       evaluations = $page.data.evaluations; // Acesse evaluations diretamente
       models = $page.data.models; // Acesse rubric models diretamente
+      students = $page.data.students; // Acesse students diretamente
       class_id = $page.data.class_id; // Acesse o class_id diretamente
     }
   }
@@ -47,6 +56,45 @@
     const totalStudents = classes.students.length; // Total de alunos na turma
     const evaluatedStudents = evaluation.evaluation_result.length; // Total de avaliações realizadas
     return { evaluatedStudents, totalStudents };
+  }
+
+  // Função para abrir o modal
+  function abrirModalRE(id: string) {
+    evaluationToRemove = id;
+    const modal = document.getElementById('remove_evaluation_modal');
+    if (modal) {
+      // @ts-ignore
+      modal.showModal();
+    }
+  }
+
+  // Função para remover uma avaliação
+  async function removeEvaluation() {
+    if (evaluationToRemove) {
+      try {
+        const evaluationDocRef = doc(db, 'evaluations', evaluationToRemove);
+
+        // Remove evaluation from the evaluations
+        evaluations = evaluations.filter(evaluation => evaluation.id !== evaluationToRemove);
+
+        // Remove the document from the Firestore
+        await deleteDoc(evaluationDocRef);
+
+        // Notifique o usuário ou atualize o estado se necessário
+        console.log(`Avaliação com id ${evaluationToRemove} removida com sucesso.`);
+      } catch (error) {
+        console.error(`Erro ao remover a avaliiação: ${evaluationToRemove}`, error);
+      } finally {
+        // Feche o modal
+        const modal = document.getElementById('remove_evaluation_modal');
+        if (modal) {
+          // @ts-ignore
+          modal.close();
+        }
+        // Limpe a rubrica para remover
+        evaluationToRemove = null;
+      }
+    }
   }
 </script>
 
@@ -88,8 +136,62 @@
                   </SlideToggle>
                 </div>
               </div>
+              {#if value == true}
               <!-- Native Table Element -->
               <table class="table table-hover bg-gray-100 dark:bg-stone-800">
+                <thead>
+                  <tr class="bg-secondary-500 dark:bg-dark-secondary">
+                    <th>Nome do Aluno</th>
+                    <th>Email</th>
+                    <th>Matrícula</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {#each students as student}
+                    <tr>
+                      <td>{student.nome} {student.sobrenome}</td>
+                      <td>{student.email}</td>
+                      <td>{student.matricula}</td>
+                      <td>
+                        <div class="flex items-center flex-nowrap">
+                          <button class="w-5 h-5 text-primary-500 hover:text-primary-300 mr-3">
+                            <FaRegListAlt/>
+                          </button>
+                          <button class="w-5 h-5 text-green-600 dark:text-green-400 hover:text-green-400 dark:hover:text-green-200 mr-3">
+                            <FaEye/>
+                          </button>
+                          <button class="w-5 h-5 text-red-700 hover:text-red-500 mr-3">
+                            <FaTrashAlt/>
+                          </button>
+                          <button class="w-5 h-5 text-cyan-600 dark:text-cyan-400 hover:text-cyan-400 dark:hover:text-cyan-200">
+                            <FaBell/>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  {/each}
+                </tbody>
+                <tfoot>
+                  <tr class="bg-secondary-500 dark:bg-dark-secondary">
+                    <th colspan="2">Adicionar Nova Avaliação</th>
+                    <td colspan="2">
+                      <form action="./{course_name}/nova avaliação" method="get">
+                        <input type="hidden" name="class_id" value={class_id}>
+                        <select class="select border-none w-[70%] bg-gray-100 dark:bg-stone-800 rounded-md p-2 mr-2" name="rubric_model_id">
+                          {#each models as model}
+                            <option value={model.rubric_id}>{model.model_name} V. {model.version}</option>
+                          {/each}
+                        </select>
+                        <button class="btn bg-primary-500 font-semibold" type="submit">Selecionar</button>
+                      </form>
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
+              {:else}
+              <!-- Native Table Element -->
+               <table class="table table-hover bg-gray-100 dark:bg-stone-800">
                 <thead>
                   <tr class="bg-secondary-500 dark:bg-dark-secondary">
                     <th>Nome da Avaliação</th>
@@ -112,7 +214,7 @@
                           <button class="w-5 h-5 text-green-600 dark:text-green-400 hover:text-green-400 dark:hover:text-green-200 mr-3">
                             <FaEye/>
                           </button>
-                          <button class="w-5 h-5 text-red-700 hover:text-red-500 mr-3">
+                          <button on:click={() => abrirModalRE(evaluation.id)} class="w-5 h-5 text-red-700 hover:text-red-500 mr-3">
                             <FaTrashAlt/>
                           </button>
                           <button class="w-5 h-5 text-cyan-600 dark:text-cyan-400 hover:text-cyan-400 dark:hover:text-cyan-200">
@@ -145,12 +247,14 @@
                   </tr>
                 </tfoot>
               </table>
+              {/if}
             </div>
           </section>
         </div>
         <Drawer></Drawer>
       </div>
     </div>
+    <Modal modalId={"remove_evaluation_modal"} modalFunction={removeEvaluation} modalTitle="Confirmar Exclusão" modalMessage="Você tem certeza que deseja remover esta avaliação? Esta ação não pode ser desfeita." modalButton="Excluir" />
     <Footer></Footer>
   </main>
   
