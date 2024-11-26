@@ -17,7 +17,7 @@
   import FaTrashAlt from 'svelte-icons/fa/FaTrashAlt.svelte'
   // @ts-ignore
   import FaBell from 'svelte-icons/fa/FaBell.svelte'
-    import Modal from '$lib/components/Modal.svelte';
+  import Modal from '$lib/components/Modal.svelte';
 
   let classes: { 
         course_id: string, course_semester: number, course_year: number, professors: any[], students: any[]
@@ -96,6 +96,11 @@
       }
     }
   }
+
+  async function openEvaluationPage(id: string) {
+  // Navegar para a página de avaliações, incluindo class_id e evaluation_id como parâmetros da URL
+  goto(`/cursos/${course_name}/avaliações?class_id=${class_id}&evaluation_id=${id}`);
+}
 </script>
 
   <svelte:head>
@@ -174,17 +179,8 @@
                 </tbody>
                 <tfoot>
                   <tr class="bg-secondary-500 dark:bg-dark-secondary">
-                    <th colspan="2">Adicionar Nova Avaliação</th>
+                    <th colspan="2">Importar Alunos</th>
                     <td colspan="2">
-                      <form action="./{course_name}/nova avaliação" method="get">
-                        <input type="hidden" name="class_id" value={class_id}>
-                        <select class="select border-none w-[70%] bg-gray-100 dark:bg-stone-800 rounded-md p-2 mr-2" name="rubric_model_id">
-                          {#each models as model}
-                            <option value={model.rubric_id}>{model.model_name} V. {model.version}</option>
-                          {/each}
-                        </select>
-                        <button class="btn bg-primary-500 font-semibold" type="submit">Selecionar</button>
-                      </form>
                     </td>
                   </tr>
                 </tfoot>
@@ -208,7 +204,7 @@
                       <td>{evaluation.evaluation_date}</td>
                       <td>
                         <div class="flex items-center flex-nowrap">
-                          <button class="w-5 h-5 text-primary-500 hover:text-primary-300 mr-3">
+                          <button class="w-5 h-5 text-primary-500 hover:text-primary-300 mr-3" on:click={() => openEvaluationPage(evaluation.id)}>
                             <FaRegListAlt/>
                           </button>
                           <button class="w-5 h-5 text-green-600 dark:text-green-400 hover:text-green-400 dark:hover:text-green-200 mr-3">
