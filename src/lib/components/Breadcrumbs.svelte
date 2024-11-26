@@ -7,28 +7,36 @@
   // Função para gerar breadcrumbs a partir da URL
   /**
      * @param {string} pathname
+     * @param {URLSearchParams} queryParams
      */
-  function generateBreadcrumbs(pathname) {
+  function generateBreadcrumbs(pathname, queryParams) {
     const segments = pathname.split('/').filter(Boolean);
-    const breadcrumbs = segments.map((segment, index) => {
-      // Verifique se o segmento parece ser um ID (você pode ajustar a verificação conforme necessário)
+    const breadcrumbs = segments.map((/** @type {string} */ segment, /** @type {number} */ index) => {
       if (isId(segment)) {
         return { 
           segment: null, 
-          href: '/' + segments.slice(0, index + 1).join('/'), 
+          href: '/' + segments.slice(0, index + 1).join('/') + buildQueryString(queryParams), 
           isCurrent: index === segments.length - 1 
         };
       }
       return { 
         segment: capitalize(decodeURIComponent(segment)), 
-        href: '/' + segments.slice(0, index + 1).join('/'), 
+        href: '/' + segments.slice(0, index + 1).join('/') + buildQueryString(queryParams), 
         isCurrent: index === segments.length - 1 
       };
-    }).filter(breadcrumb => breadcrumb.segment); // Filtra breadcrumbs sem segmento
+    }).filter((/** @type {{ segment: any; }} */ breadcrumb) => breadcrumb.segment); // Filtra breadcrumbs sem segmento
     return breadcrumbs;
   }
 
-  // Função para capitalizar a primeira letra
+  // Função para construir a query string com base nos parâmetros
+  /**
+     * @param {string | string[][] | Record<string, string> | URLSearchParams | undefined} params
+     */
+  function buildQueryString(params) {
+    const query = new URLSearchParams(params);
+    return query.toString() ? `?${query.toString()}` : '';
+  }
+
   /**
      * @param {string} string
      */
@@ -36,24 +44,22 @@
     return string.charAt(0).toUpperCase() + string.slice(1);
   }
 
-  // Função para verificar se o segmento parece ser um ID
   /**
      * @param {string | any[]} segment
      */
   function isId(segment) {
-    // Ajuste a lógica conforme necessário para identificar IDs
     // @ts-ignore
     return segment.length === 20 && /^[A-Za-z0-9]+$/.test(segment); // Exemplo para IDs do Firebase
   }
 
   // Store derivada para os breadcrumbs
-  const breadcrumbs = derived(page, $page => generateBreadcrumbs($page.url.pathname));
+  const breadcrumbs = derived(page, $page => generateBreadcrumbs($page.url.pathname, $page.url.searchParams));
 </script>
 
 <ol class="breadcrumb mt-2">
   <li class="crumb">
     <a href="/">
-      <div class="ml-2 w-6"><IoMdHome /> </div><!-- Ícone da home -->
+      <div class="ml-2 w-6"><IoMdHome /> </div>
     </a>
   </li>
   {#each $breadcrumbs as { segment, href, isCurrent }}

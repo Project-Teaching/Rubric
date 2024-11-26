@@ -143,7 +143,7 @@ export const actions: Actions = {
         evaluation_course,
         evaluation_result: [
             { evaluation_comments: '', evaluation_notes: '', group_id: '', student_id: '', score: 0, professor_id: locals.userID, 
-              rubric_evaluatiion: [ { criterion_number: 1, level_number: 2 }, { criterion_number: 2, level_number: 3 } ]
+              rubric_evaluation: [ { criterion_number: 1, level_number: 2 }, { criterion_number: 2, level_number: 3 } ]
              },
         ]
       };
