@@ -105,8 +105,8 @@
 
 <style>
   th, td {
-    max-width: 15.4vw;
-    min-width: 15.4vw;
+    max-width: 13.4vw;
+    min-width: 13.4vw;
   }
 
 
