@@ -51,6 +51,14 @@
       class_id = $page.data.class_id; // Acesse o class_id diretamente
     }
   }
+
+  function openModalRubric() {
+    const modal = document.getElementById('rubricModal');
+    if (modal) {
+      // @ts-ignore
+      modal.showModal();
+    }
+  }
 </script>
 
   <svelte:head>
@@ -96,7 +104,7 @@
                       <td>Não Avaliado</td>
                       <td>
                         <div class="flex items-center flex-nowrap">
-                          <button class="w-5 h-5 text-primary-500 hover:text-primary-300 mr-3">
+                          <button on:click={openModalRubric} class="w-5 h-5 text-primary-500 hover:text-primary-300 mr-3">
                             <FaRegListAlt/>
                           </button>
                           <button class="w-5 h-5 text-green-600 dark:text-green-400 hover:text-green-400 dark:hover:text-green-200 mr-3">
@@ -104,9 +112,6 @@
                           </button>
                           <button class="w-5 h-5 text-red-700 hover:text-red-500 mr-3">
                             <FaTrashAlt/>
-                          </button>
-                          <button class="w-5 h-5 text-cyan-600 dark:text-cyan-400 hover:text-cyan-400 dark:hover:text-cyan-200">
-                            <FaBell/>
                           </button>
                         </div>
                       </td>
@@ -124,6 +129,19 @@
           </section>
         </div>
         <div class="hidden"><ModalRubric docId={rubricModel.id}></ModalRubric></div>
+        <!-- Modal de confirmação -->
+        <dialog id="rubricModal" class="modal">
+          <div class="w-[80%] bg-secondary-500 dark:bg-dark-surface p-2">
+            <h3 class="text-lg font-bold">Avaliação Aluno</h3>
+            <div class="modal-action">
+              <ModalRubric docId={rubricModel.id}></ModalRubric>
+              <form method="dialog">
+                <!-- if there is a button in form, it will close the modal -->
+                <button class="btn bg-secondary-200 dark:bg-dark-secondary">Cancelar</button>
+              </form>
+            </div>
+          </div>
+        </dialog>
         <Drawer></Drawer>
       </div>
     </div>
