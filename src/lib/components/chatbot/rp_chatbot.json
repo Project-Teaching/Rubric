@@ -1,0 +1,12 @@
+[
+  {
+    "question": "Como faço para realizar uma avaliação?",
+    "answer": "Você pode realizar uma avaliação clicando na aba 'Avaliações' e seguindo as instruções.",
+    "keywords": ["realiz", "aval"]
+  },
+  {
+    "question": "Como atualizar meus dados cadastrais?",
+    "answer": "Vá até 'Configurações' e clique em 'Atualizar dados'.",
+    "keywords": ["atualiz", "dad", "cadastr"]
+  }
+]
