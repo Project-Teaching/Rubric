@@ -5,6 +5,6 @@
       <li><a href="/cursos/">Cursos e Disciplinas</a></li>
       <li><a href="/discentes/">Discentes</a></li>
       <li><a href="/">Modelos de Rubricas</a></li>
-      <li><a href="/">Suporte</a></li>
+      <li><a href="/suporte/chatbot/">Suporte</a></li>
     </ul>
   </div>
