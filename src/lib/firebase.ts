@@ -5,13 +5,13 @@ import { getStorage } from "firebase/storage";
 import { writable, type Readable, derived } from "svelte/store";
 
 const firebaseConfig = {
-    apiKey: "AIzaSyDaiomXEL2enKLZM-PbWWWhuNh6d-dnZZs",
-    authDomain: "unirubric.firebaseapp.com",
-    projectId: "unirubric",
-    storageBucket: "unirubric.appspot.com",
-    messagingSenderId: "215416252097",
-    appId: "1:215416252097:web:c245d8b09e7bacd5a05640",
-    measurementId: "G-LX93K4MBGQ"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
 // Initialize Firebase
