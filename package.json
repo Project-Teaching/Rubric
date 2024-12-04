@@ -28,6 +28,7 @@
 	"dependencies": {
 		"firebase": "^10.8.0",
 		"firebase-admin": "^12.0.0",
+		"node-nlp": "^4.27.0",
 		"papaparse": "^5.4.1",
 		"rubric": "file:",
 		"svelte-icons": "^2.1.0"

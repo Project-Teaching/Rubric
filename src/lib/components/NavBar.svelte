@@ -12,8 +12,10 @@
   const theme = writable('LRtheme');
   let photoURL = '/user.png'; // Valor padrão para a imagem
 
-  $: if ($user && $user.photoURL) {
-    photoURL = $user.photoURL; // Atribuir a URL do Firebase se disponível
+  $: if ($user) {
+    photoURL = $user.photoURL ? `${$user.photoURL}?t=${new Date().getTime()}` : '/user.png';
+  } else {
+    photoURL = '/user.png';
   }
   
   async function signInWithGoogle() {
@@ -82,7 +84,7 @@
       <div class="dropdown dropdown-end">
         <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
           <div class="w-10 rounded-full">
-            <img src={$user.photoURL ? `${$user.photoURL}?t=${new Date().getTime()}` : '/user.png'} alt="User Profile" />
+            <img src={photoURL} alt="User Profile" on:error="{() => photoURL = '/user.png'}" />
           </div>
         </div>
         <ul tabindex="0" class="menu menu-sm rounded-xl dropdown-content bg-secondary-500 dark:bg-dark-secondary rounded-box z-[1] mt-4 w-52 p-2 shadow">
