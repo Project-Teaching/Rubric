@@ -57,6 +57,7 @@
     overscroll-behavior: contain;
     height: 100vh;
     height: 100dvh;
+    z-index: 1000;
 }
 .drawer-side>.drawer-overlay {
     position: sticky;

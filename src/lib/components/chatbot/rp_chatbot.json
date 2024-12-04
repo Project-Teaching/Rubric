@@ -1,12 +1,34 @@
 [
   {
-    "question": "Como faço para realizar uma avaliação?",
-    "answer": "Você pode realizar uma avaliação clicando na aba 'Avaliações' e seguindo as instruções.",
-    "keywords": ["realiz", "aval"]
+    "question": "Como faço para criar uma avaliação?",
+    "answer": "Você pode criar uma avaliação clicando na aba lateral de `|||` e clicando em 'Cursos e Disciplinas', logo após isso selecione a disciplina que deseja avaliar e clique em 'Nova Avaliação' na tabela."
   },
   {
     "question": "Como atualizar meus dados cadastrais?",
-    "answer": "Vá até 'Configurações' e clique em 'Atualizar dados'.",
-    "keywords": ["atualiz", "dad", "cadastr"]
+    "answer": "Clique na foto de seu perfil no canto superior direito e clique em 'Meu Perfil'. Lá você poderá atualizar seus dados."
+  },
+  {
+    "question": "Como eu edito meu perfil de usuário?",
+    "answer": "Clique na foto de seu perfil no canto superior direito e clique em 'Meu Perfil'. Lá você poderá atualizar seus dados."
+  },
+  {
+    "question": "Como faço para criar um modelo de rubrica?",
+    "answer": "Você pode criar um modelo de rubrica clicando na aba lateral de `|||` e clicando em 'Gerenciador de Rubricas', logo após isso clique no '+' para adicionar um novo modelo."
+  },
+  {
+    "question": "Como eu utilizo a rubrica em uma avaliação?",
+    "answer": "Para utilizar a rubrica em uma avaliação, ao criar uma nova avaliação na tabela de avaliações você deve selecionar o modelo desejado no campo seletor."
+  },
+  {
+    "question": "Como eu importo meus alunos para uma disciplina?",
+    "answer": "Para importar alunos para uma disciplina, clique na aba lateral de `|||` e clique em 'Cursos e Disciplinas', logo após isso selecione a disciplina desejada, clique no toggle que troca entre avaliações e lista de alunos, logo após clique em 'Importar Alunos'."
+  },
+  {
+    "question": "Como funciona o sistema de Tags nas Rubricas?",
+    "answer": "Você pode adicionar Tags nas rubricas para facilitar a busca de modelos de rubricas. Para adicionar Tags, clique no modelo de rubrica desejado e adicione as Tags desejadas na parte inferior da página, siga as instruções para que a Tag seja válida e caso ela não exista ainda, não se preocupe, o sistema criará uma Tag nova automaticamente."
+  },
+  {
+    "question": "Como eu notifico meus alunos de suas notas?",
+    "answer": "Para notificar seus alunos de suas notas, clique na aba lateral de `|||` e clique em 'Cursos e Disciplinas', logo após isso na tabela de Avaliações você verá o progresso de sua turma, quando as avaliações estiverem completas você pode clicar no ícone de 'Sino' em uma avaliação e todos serão notificados. Caso queira também é possível selecionar a avaliação, listar seus alunos e notificar individualmente cada um."
   }
 ]
