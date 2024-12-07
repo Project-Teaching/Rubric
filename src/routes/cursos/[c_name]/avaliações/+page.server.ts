@@ -1,7 +1,6 @@
 import type { PageServerLoad } from './$types';
 import { adminDB } from '$lib/server/admin';
 import { Timestamp } from 'firebase-admin/firestore';
-import type { Actions } from '@sveltejs/kit';
 
 export const load: PageServerLoad = async ({ locals, url, params }) => {
   const course_name = params.c_name;  // Pega o nome da disciplina da URL
@@ -69,6 +68,7 @@ export const load: PageServerLoad = async ({ locals, url, params }) => {
               students: studentsData,
               evaluation: evaluationData,
               rubricModel: rubricData, // Modelos de rubricas para as avaliações
+              professorId: uid,
             };
           }
           else {
@@ -86,43 +86,5 @@ export const load: PageServerLoad = async ({ locals, url, params }) => {
     }
   } else {
     console.log('class_id não encontrado no Params da página.');
-  }
-};
-
-export const actions: Actions = {
-  // Ações para lidar com a avaliação de cada aluno (para ser implementado depois)
-  default: async ({ request, locals }) => {
-    const formData = await request.formData();
-
-    const student_id = formData.get('student_id') as string;
-    const rubric_model_id = formData.get('rubric_model_id') as string;
-    const score = Number(formData.get('score') as unknown); // Nota para o aluno
-    const evaluation_comments = formData.get('evaluation_comments') as string; // Comentários sobre a avaliação
-
-    try {
-      // Salvar a avaliação no banco de dados
-      const newEvaluationResult = {
-        student_id,
-        rubric_model_id,
-        score,
-        evaluation_comments,
-        professor_id: locals.userID,
-      };
-
-      // Exemplo de salvamento no Firestore (usando uma coleção de resultados de avaliação)
-      const evaluationResultsRef = adminDB.collection('evaluation_results');
-      await evaluationResultsRef.add(newEvaluationResult);
-
-      return {
-        success: true,
-        message: 'Avaliação salva com sucesso!',
-      };
-    } catch (error) {
-      console.error('Erro ao salvar a avaliação:', error);
-      return {
-        success: false,
-        message: 'Erro ao salvar a avaliação. Tente novamente.',
-      };
-    }
   }
 };

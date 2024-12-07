@@ -203,8 +203,11 @@
             saveRubricField(docId, "criteria", r.criteria);
           }
         } else if (field.includes("performance_levels")) {
-          const [_, index, subfield] = field.split(".");
-          // @ts-ignore
+        const [_, index, subfield] = field.split(".");
+          // Verifique se o campo é o 'value' e converta para número, se necessário
+          if (subfield === "value") {
+            value = Number(value);  // Garantir que o valor seja um número
+          }
           r.performance_levels[index][subfield] = value;
           saveRubricField(docId, "performance_levels", r.performance_levels);
         }
@@ -439,6 +442,38 @@
   // CONTROLE DE DRAG AND DROP DE COLUNAS - END
   // CONTROLE DE DRAG AND DROP - END
 
+
+  async function saveAll() {
+    const docRef = doc(db, "rubrics", docId);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      // Pega o valor atual do 'rubric' armazenado no writable
+      rubric.subscribe(async (currentRubric) => {
+        if (currentRubric) {
+          // Se o writable não for nulo, salva os dados no Firestore
+          const updatedData = {
+            ...docSnap.data(), // Obtém os dados existentes no Firestore
+            model_name: currentRubric.model_name,
+            course: currentRubric.course,
+            major: currentRubric.major,
+            criteria: currentRubric.criteria,
+            performance_levels: currentRubric.performance_levels,
+            public: currentRubric.public,
+            version: currentRubric.version,
+            original_model: currentRubric.original_model,
+            finished: currentRubric.finished,
+          };
+
+          // Atualiza o documento no Firestore com os novos dados
+          await updateDoc(docRef, updatedData);
+          console.log("Rubric atualizada com sucesso!");
+        }
+      });
+    } else {
+      console.error("Documento não encontrado!");
+    }
+  }
   onMount(() => {
     fetchRubric(docId);
   });
@@ -450,8 +485,7 @@
     <div class="flex justify-between mb-4">
       <div>
         <button class="btn variant-filled-primary ml-2" on:click={addCriterion}
-          >Linha +</button
-        >
+          >Linha +</button>
         <!--<button
           class="btn variant-filled-secondary mr-2"
           on:click={() => removeCriterion($rubric.criteria.length - 1)}
@@ -636,17 +670,22 @@
       </table>
     </div>
     <!-- TAGS DA RUBRICA -->
-    <div class="flex justify-start">
-      <div class="w-max m-2">
-        Cursos:
-        <TagAutoComplete {docId} field={"major"} />
-      </div>
-      <div class="w-max m-2">
-        Disciplinas:
-        <TagAutoComplete {docId} field={"course"} />
-      </div>
+    <div class="w-max-[100vw] flex justify-between items-center">
+      <div class="flex justify-start">
+        <div class="w-max m-2">
+          Cursos:
+          <TagAutoComplete {docId} field={"major"} />
+        </div>
+        <div class="w-max m-2">
+          Disciplinas:
+          <TagAutoComplete {docId} field={"course"} />
+        </div>
+      </div> 
+      <div class="flex justify-center items-center m-2 ml-5">
+        <button class="btn variant-filled-primary ml-2" on:click={saveAll}
+        >Salvar Rubrica</button>
+      </div> 
     </div>
-
     <!-- Modal para editar descritores -->
     <dialog id="edit_modal" class="modal">
       <div class="modal-box bg-secondary-500 dark:bg-dark-surface p-2">
