@@ -100,15 +100,15 @@
             <button class="btn variant-filled-primary text-white dark:text-white py-2 px-4 rounded">Pesquisar Modelos</button>
           </div>
         
-          <div class="flex flex-wrap gap-8">
+          <div class="flex flex-wrap gap-8 items-center justify-center">
             {#each rubricas as rubrica (rubrica.id)}
               <div class="flex flex-col h-44 w-[25vw] mb-2">
                 <div class="bg-secondary-500 dark:bg-dark-secondary h-32 m-3 rounded-lg shadow-md hover-up">
                   <div class="flex m-4 inset-0 h-full">
                     <div class="text-bg-200 font-bold p-2 rounded mb-2 w-4/5 h-min">
-                      N° de Curso(s): 3 <br/>
-                      N° de Disciplina(s): 15 <br/>
-                      N° de Avaliações: 20
+                      #03 Curso(s) <br/>
+                      #15 Disciplina(s) <br/>
+                      #20 Avaliações
                     </div>
                     <div class="flex flex-col items-end inset-0 ml-4 gap-y-4">
                       <button on:click={() => abrirModal(rubrica.id)} class="pb-1 bg-error-500 hover:bg-error-900 w-8 h-8 text-white rounded-full">

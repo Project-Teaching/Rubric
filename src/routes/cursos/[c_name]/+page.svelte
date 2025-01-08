@@ -54,7 +54,7 @@
 
   function calculateProgress(evaluation: any) {
     const totalStudents = classes.students.length; // Total de alunos na turma
-    const evaluatedStudents = evaluation.evaluation_result.length; // Total de avaliações realizadas
+    const evaluatedStudents = evaluation.evaluation_result.length-1; // Total de avaliações realizadas
     return { evaluatedStudents, totalStudents };
   }
 

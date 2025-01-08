@@ -27,7 +27,7 @@
             </div>
             <div class="p-content">
               <h1 class="text-2xl font-bold text-primary-500">Como funciona nosso aplicativo?</h1>
-              <p class="py-4 text-base">O “nome” é um sistema que permite a criação e gerenciamento de rubricas de avaliação. Utilizando nosso aplicativo você terá uma facilidade maior na criação de suas rubricas de avaliação personalizadas e poderá aplicar as mesmas por dentro do sistema</p>
+              <p class="py-4 text-base">O RubricPro é um sistema que permite a criação e gerenciamento de rubricas de avaliação. Utilizando nosso aplicativo você terá uma facilidade maior na criação de suas rubricas de avaliação personalizadas e poderá aplicar as mesmas por dentro do sistema</p>
             </div>
           </div>
           <div class="p-content"> <!-- Bloco de Rubric Models -->

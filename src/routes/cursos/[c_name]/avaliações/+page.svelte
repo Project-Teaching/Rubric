@@ -113,8 +113,8 @@
                     <th>Nome do Aluno</th>
                     <th>Email</th>
                     <th>Matrícula</th>
-                    <th>Situação</th>
                     <th>Ações</th>
+                    <th>Situação</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -123,7 +123,6 @@
                       <td>{student.nome} {student.sobrenome}</td>
                       <td>{student.email}</td>
                       <td>{student.matricula}</td>
-                      <td>{getStudentStatus(student.id)}</td>
                       <td>
                         <div class="flex items-center flex-nowrap">
                           <button on:click={() => openModalRubric(student.id, student.nome, student.sobrenome)} class="w-5 h-5 text-primary-500 hover:text-primary-300 mr-3">
@@ -137,6 +136,7 @@
                           </button>
                         </div>
                       </td>
+                      <td>{getStudentStatus(student.id)}</td>
                     </tr>
                   {/each}
                 </tbody>
@@ -152,11 +152,11 @@
         </div>
         <!-- Modal de Avaliação -->
         <dialog id="rubricModal" class="modal">
-          <div class="w-[85%] bg-secondary-500 dark:bg-dark-surface p-6 m-2 flex flex-col items-center justify-center relative">
+          <div class="w-[85%] bg-surface-400 dark:bg-dark-surface p-6 m-2 flex flex-col items-center justify-center relative">
           <div class="flex items-center justify-between">
             <!-- Botão Cancelar -->
-            <form class="mr-12" method="dialog">
-              <button on:click={closeModalRubric} class="btn bg-secondary-200 text-white dark:bg-dark-secondary">X</button>
+            <form method="dialog">
+              <button on:click={closeModalRubric} class="absolute top-4 right-4 rounded-full w-8 h-8 flex items-center justify-center bg-primary-500 text-white dark:bg-red-800">X</button>
             </form>
             <!-- Título centralizado -->
             <h3 class="text-lg font-bold ml-5 mb-4 text-center">Avaliação do Aluno {currentStudent?.nome} {currentStudent?.sobrenome}</h3>

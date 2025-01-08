@@ -146,7 +146,7 @@
           {#each $rubric.criteria as criterion, cIndex}
             <tr class="transition-all">
               <!-- Ícone de drag-and-drop -->
-              <td class="border border-tertiary-500 border-solid p-2 dark:bg-dark-secondary">
+              <td class="border border-tertiary-500 bg-secondary-500 border-solid p-2 dark:bg-dark-secondary">
               {criterion.name}
               </td>
               {#each criterion.descriptors as descriptor, dIndex}
@@ -187,6 +187,5 @@
   }
   .selected {
     background-color: #218d03;
-    color: white;
   }
 </style>
