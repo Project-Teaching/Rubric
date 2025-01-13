@@ -3,6 +3,7 @@
   import { db } from "$lib/firebase";
   import { onMount } from "svelte";
   import { writable } from "svelte/store";
+  import { t } from "svelte-i18n";
 
   interface Criterion {
     name: string;
@@ -127,7 +128,7 @@
         <thead class="table-header-group bg-secondary-500 dark:bg-dark-secondary text-md">
           <tr>
             <!-- PERFORMANCE LEVELS -->
-            <th class="border border-tertiary-500 border-solid">Critério</th>
+            <th class="border border-tertiary-500 border-solid">{$t('criterion')}</th>
             {#each $rubric.performance_levels as level, colIndex}
               <th
                 class="border border-tertiary-500 border-solid p-4"
@@ -136,7 +137,7 @@
                 </div>
                 {level.name}
                 <br />
-                {level.value} pontos
+                {level.value} {$t('points')}
               </th>
             {/each}
           </tr>
@@ -170,14 +171,14 @@
       </table>
     </div>
     <div class="flex items-center justify-between m-2">
-      <p class="mt-4 text-lg font-bold">Pontuação Total: {$totalScore}</p>
+      <p class="mt-4 text-lg font-bold">{$t('total_score')}: {$totalScore}</p>
       <!-- Botão Salvar -->
       <button on:click={() => updateEvaluationResult()} class="mt-5 btn bg-primary-500 text-white hover:bg-primary-600">
-        Salvar
+        {$t('save')}
       </button>
     </div>
 {:else}
-  <p>Carregando rubrica...</p>
+  <p>{$t('loading_rubric')}</p>
 {/if}
 
 <style>

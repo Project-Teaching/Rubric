@@ -15,7 +15,7 @@
   // @ts-ignore
   import ModalRubric from '$lib/components/rubric/ModalRubric.svelte';
     import { reload } from 'firebase/auth';
-
+  import { t } from 'svelte-i18n';
   let classes: { 
         course_id: string, course_semester: number, course_year: number, professors: any[], students: any[]
       };
@@ -96,25 +96,25 @@
         <div class="drawer-content">
           <!-- Conteúdo principal aqui -->
           <div class="h-2 flex justify-center text-center"> <!-- Bloco de Texto Principal 1 -->
-            <h1 class="text-2xl font-bold text-primary-500">Disciplina - {course_name} {classes.course_semester}. Semestre - {classes.course_year} <br /> Avaliação: {evaluation.evaluation_name}</h1>
+            <h1 class="text-2xl font-bold text-primary-500">{$t('course')} - {course_name} {classes.course_semester}. {$t('semester')} - {classes.course_year} <br /> {$t('evaluation')}: {evaluation.evaluation_name}</h1>
           </div>
           <section class="container mx-auto mt-20 mb-10 min-h-[50vh]">  
             <!-- Responsive Container (recommended) -->
             <div class="table-container">
               <div class="w-full mb-2 flex justify-between flex-nowrap">
                 <p class="text-primary-500 font-bold text-lg">                    
-                  Lista de Alunos
+                  {$t('alumn_list')}
                 </p>
               </div>
               <!-- Native Table Element -->
               <table class="table table-hover bg-gray-100 dark:bg-stone-800">
                 <thead>
                   <tr class="bg-secondary-500 dark:bg-dark-secondary">
-                    <th>Nome do Aluno</th>
-                    <th>Email</th>
-                    <th>Matrícula</th>
-                    <th>Ações</th>
-                    <th>Situação</th>
+                    <th>{$t('evaluations_table_student_name')}</th>
+                    <th>{$t('evaluations_table_student_email')}</th>
+                    <th>{$t('evaluations_table_student_id')}</th>
+                    <th>{$t('evaluations_table_actions')}</th>
+                    <th>{$t('evaluations_table_situation')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -159,7 +159,7 @@
               <button on:click={closeModalRubric} class="absolute top-4 right-4 rounded-full w-8 h-8 flex items-center justify-center bg-primary-500 text-white dark:bg-red-800">X</button>
             </form>
             <!-- Título centralizado -->
-            <h3 class="text-lg font-bold ml-5 mb-4 text-center">Avaliação do Aluno {currentStudent?.nome} {currentStudent?.sobrenome}</h3>
+            <h3 class="text-lg font-bold ml-5 mb-4 text-center">{$t('student_evaluation')}: {currentStudent?.nome} {currentStudent?.sobrenome}</h3>
           </div>
             <!-- Matriz ou conteúdo do modal -->
             <div class="w-full overflow-x-auto">

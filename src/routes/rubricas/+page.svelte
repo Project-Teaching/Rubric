@@ -8,6 +8,7 @@
   import { goto } from '$app/navigation';
   import { doc, deleteDoc } from 'firebase/firestore';
   import { db } from '$lib/firebase'; // Ajuste o caminho conforme sua configuração
+  import { t } from 'svelte-i18n';
 
   let rubricas: { 
         id: string, uid: string, major: string, course: string, performance_levels:any[], criteria: any[], model_name: string, version: number, public: boolean, original_model: string, finished: boolean
@@ -83,21 +84,21 @@
       <div class="drawer-content">
         <!-- Conteúdo principal aqui -->
         <div class="h-2 flex justify-center"> <!-- Bloco de Texto Principal 1 -->
-          <h1 class="text-2xl font-bold text-primary-500">Gerenciador de Rubricas de Avaliação</h1>
+          <h1 class="text-2xl font-bold text-primary-500">{$t('rubric_manager_title1')}</h1>
         </div>
         <section class="container mx-auto mt-10">
           <!-- svelte-ignore a11y-missing-content -->
           <h1 class="text-3xl font-bold mb-5 text-center"></h1>
           {#if rubricas?.length === 0}
             <p class="text-center mb-10">
-              Parece que você não tem nenhuma rubrica de avaliação criada ainda!
+              {$t('rubric_manager_no_rubric')}
               <br />
-              Logo abaixo você verá alguns modelos de nosso sistema, ou poderá criar sua rubrica do zero!
+              {$t('rubric_manager_no_rubric_pt2')}
             </p>
           {/if}
         
           <div class="flex justify-center mb-5">
-            <button class="btn variant-filled-primary text-white dark:text-white py-2 px-4 rounded">Pesquisar Modelos</button>
+            <button class="btn variant-filled-primary text-white dark:text-white py-2 px-4 rounded">{$t('rubric_manager_search_btn')}</button>
           </div>
         
           <div class="flex flex-wrap gap-8 items-center justify-center">
@@ -122,7 +123,7 @@
 
                 </div>
                 <p class="text-center text-primary-500 font-semibold">
-                    {rubrica.model_name ? rubrica.model_name : "Modelo Temporariamente Não-Nomeado"}
+                    {rubrica.model_name ? rubrica.model_name : $t('blank_rubric_name')}
                 </p>
               </div>
             {/each}
@@ -138,7 +139,7 @@
 
               </div>
               <p class="text-center text-primary-500 font-semibold">
-                  Crie seu próprio modelo personalizado
+                  {$t('rubric_manager_create_btn')}
               </p>
             </div>
           </div>
@@ -149,7 +150,7 @@
   </div>
   <Footer></Footer>
   
-  <Modal modalId={"confirm_modal"} modalFunction={removerRubrica} modalTitle="Confirmar Exclusão" modalMessage="Você tem certeza que deseja remover esta rubrica? Esta ação não pode ser desfeita." modalButton="Excluir" />
+  <Modal modalId={"confirm_modal"} modalFunction={removerRubrica} modalTitle={$t('modal_delete_title')} modalMessage={$t('modal_delete_message')} modalButton={$t('modal_delete_btn')} />
 </main>
 
 <style>

@@ -28,9 +28,12 @@
 	"dependencies": {
 		"firebase": "^10.8.0",
 		"firebase-admin": "^12.0.0",
+		"flag-icons": "^7.2.3",
 		"node-nlp": "^4.27.0",
 		"papaparse": "^5.4.1",
 		"rubric": "file:",
+		"shepherd.js": "^14.3.0",
+		"svelte-i18n": "^4.0.1",
 		"svelte-icons": "^2.1.0"
 	}
 }
