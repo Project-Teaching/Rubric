@@ -10,6 +10,7 @@
   import IoIosArrowDown from 'svelte-icons/io/IoIosArrowDown.svelte'
   // @ts-ignore
   import IoIosArrowUp from 'svelte-icons/io/IoIosArrowUp.svelte'
+  import { t } from 'svelte-i18n';
 
   let majors: { 
         id:string, major_id: string, major_name: string, major_courses: courses[] 
@@ -49,12 +50,12 @@
       <div class="drawer-content">
         <!-- Conteúdo principal aqui -->
         <div class="h-2 flex justify-center"> <!-- Bloco de Texto Principal 1 -->
-          <h1 class="text-2xl font-bold text-primary-500">Cursos e Disciplinas</h1>
+          <h1 class="text-2xl font-bold text-primary-500">{$t('majors and courses')}</h1>
         </div>
         <section class="container mx-auto mt-10">
           {#if majors?.length === 0}
             <p class="text-center mb-10">
-              Parece que ainda não tem nenhum curso e disciplina ligados a você!
+              {$t('no majors and courses found')}
             </p>
           {/if}
           <Accordion>

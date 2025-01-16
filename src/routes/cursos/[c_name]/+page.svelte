@@ -8,7 +8,6 @@
   import { goto } from "$app/navigation";
   import { doc, deleteDoc } from "firebase/firestore";
   import { db } from "$lib/firebase"; // Ajuste o caminho conforme sua configuração
-
   // @ts-ignore
   import FaRegListAlt from "svelte-icons/fa/FaRegListAlt.svelte";
   // @ts-ignore
@@ -18,7 +17,8 @@
   // @ts-ignore
   import FaBell from "svelte-icons/fa/FaBell.svelte";
   import Modal from "$lib/components/Modal.svelte";
-
+  import { t } from 'svelte-i18n';
+  
   let classes: {
     course_id: string;
     course_semester: number;
@@ -38,6 +38,7 @@
     rubric_model_id: string;
     evaluation_result: evaluation_results[];
   }[];
+
   let models: {
     rubric_id: string;
     model_name: string;
@@ -77,7 +78,7 @@
 
   function calculateProgress(evaluation: any) {
     const totalStudents = classes.students.length; // Total de alunos na turma
-    const evaluatedStudents = evaluation.evaluation_result.length; // Total de avaliações realizadas
+    const evaluatedStudents = evaluation.evaluation_result.length-1; // Total de avaliações realizadas
     return { evaluatedStudents, totalStudents };
   }
 
@@ -155,8 +156,8 @@
         <div class="h-2 flex justify-center text-center">
           <!-- Bloco de Texto Principal 1 -->
           <h1 class="text-2xl font-bold text-primary-500">
-            Disciplina - {course_name} <br />
-            {classes.course_semester}. Semestre - {classes.course_year}
+            {$t('course')} - {course_name} <br />
+            {classes.course_semester}. {$t('semester')} - {classes.course_year}
           </h1>
         </div>
         <section class="container mx-auto mt-20 mb-10 min-h-[50vh]">
@@ -165,17 +166,17 @@
             <div class="w-full mb-2 flex justify-between flex-nowrap">
               <p class="text-primary-500 font-bold text-lg">
                 {#if value == true}
-                  Lista de Alunos
+                  {$t('alumn_list')}
                 {:else}
-                  Lista de Avaliações
+                  {$t('evaluation_list')}
                 {/if}
               </p>
               <div class="flex items-center">
                 <p class="font-bold text-md mr-2">
                   {#if value == true}
-                    Lista de Avaliações
+                    {$t('evaluation_list')}
                   {:else}
-                    Lista de Alunos
+                    {$t('alumn_list')}
                   {/if}
                 </p>
                 <SlideToggle
@@ -192,10 +193,10 @@
               <table class="table table-hover bg-gray-100 dark:bg-stone-800">
                 <thead>
                   <tr class="bg-secondary-500 dark:bg-dark-secondary">
-                    <th>Nome do Aluno</th>
-                    <th>Email</th>
-                    <th>Matrícula</th>
-                    <th>Ações</th>
+                    <th>{$t('evaluations_table_student_name')}</th>
+                    <th>{$t('evaluations_table_student_email')}</th>
+                    <th>{$t('evaluations_table_student_id')}</th>
+                    <th>{$t('evaluations_table_actions')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -233,12 +234,12 @@
                 </tbody>
                 <tfoot>
                   <tr class="bg-secondary-500 dark:bg-dark-secondary">
-                    <th colspan="2">Adicionar Novo Aluno</th>
+                    <th colspan="2">{$t('evaluations_table_import_students')}</th>
                     <td colspan="2">
                       <button
                         on:click={openNewStudentPage}
                         class="btn bg-primary-500 font-semibold"
-                        >Adicionar Aluno</button
+                        >{$t('student_add')}</button
                       >
                     </td>
                   </tr>
@@ -249,10 +250,10 @@
               <table class="table table-hover bg-gray-100 dark:bg-stone-800">
                 <thead>
                   <tr class="bg-secondary-500 dark:bg-dark-secondary">
-                    <th>Nome da Avaliação</th>
-                    <th>Prazo Final para Avaliar</th>
-                    <th>Ações</th>
-                    <th>Progresso</th>
+                    <th>{$t('evaluations_table_evaluation_name')}</th>
+                    <th>{$t('evaluations_table_evaluation_date')}</th>
+                    <th>{$t('evaluations_table_actions')}</th>
+                    <th>{$t('evaluations_table_evaluation_progress')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -306,7 +307,7 @@
                 </tbody>
                 <tfoot>
                   <tr class="bg-secondary-500 dark:bg-dark-secondary">
-                    <th colspan="2">Adicionar Nova Avaliação</th>
+                    <th colspan="2">{$t('evaluations_table_add_new_evaluation')}</th>
                     <td colspan="2">
                       <form
                         action="./{course_name}/nova avaliação"
@@ -323,10 +324,7 @@
                             >
                           {/each}
                         </select>
-                        <button
-                          class="btn bg-primary-500 font-semibold"
-                          type="submit">Selecionar</button
-                        >
+                        <button class="btn bg-primary-500 font-semibold" type="submit">{$t('select')}</button>
                       </form>
                     </td>
                   </tr>
@@ -338,16 +336,9 @@
       </div>
       <Drawer></Drawer>
     </div>
-  </div>
-  <Modal
-    modalId={"remove_evaluation_modal"}
-    modalFunction={removeEvaluation}
-    modalTitle="Confirmar Exclusão"
-    modalMessage="Você tem certeza que deseja remover esta avaliação? Esta ação não pode ser desfeita."
-    modalButton="Excluir"
-  />
-  <Footer></Footer>
-</main>
-
-<style>
-</style>
+    <Modal modalId={"remove_evaluation_modal"} modalFunction={removeEvaluation} modalTitle={$t('modal_delete_title')} modalMessage={$t('modal_evaluation_delete_message')} modalButton={$t('modal_delete_btn')} />
+    <Footer></Footer>
+  </main>
+  
+  <style>
+  </style>

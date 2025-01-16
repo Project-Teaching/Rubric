@@ -5,6 +5,7 @@
   import Footer from "$lib/components/Footer.svelte";
   import Drawer from '$lib/components/Drawer.svelte';
   import Breadcrumbs from "$lib/components/Breadcrumbs.svelte";
+  import { t } from 'svelte-i18n';
 
   let docId: string | undefined;
 
@@ -30,13 +31,13 @@
           <div class="drawer-content">
             <!-- Conteúdo principal aqui -->
             <div class="h-2 flex justify-center"> <!-- Bloco de Texto Principal 1 -->
-              <h1 class="text-2xl font-bold text-primary-500">Rubrica de Avaliação Modelo Personalizado</h1>
+              <h1 class="text-2xl font-bold text-primary-500">{$t('create_rubric_blank_name')}</h1>
             </div>
             
             {#if docId}
             <EditRubric docId={docId} />
           {:else}
-            <p>Criando rubrica...</p>
+            <p>{$t('building_rubric')}</p>
           {/if}
           </div>
           <Drawer></Drawer>

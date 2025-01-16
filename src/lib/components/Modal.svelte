@@ -1,5 +1,6 @@
 <script lang="ts">
     export let modalFunction: any, modalTitle: any, modalMessage: any, modalButton: any, modalId: any;
+    import { t } from 'svelte-i18n';
 </script>
 
   <!-- Modal de confirmação -->
@@ -11,7 +12,7 @@
         <button on:click={modalFunction} class="btn variant-filled-error dark:bg-error-500">{modalButton}</button>
         <form method="dialog">
           <!-- if there is a button in form, it will close the modal -->
-          <button class="btn bg-secondary-200 dark:bg-dark-secondary">Cancelar</button>
+          <button class="btn bg-secondary-200 dark:bg-dark-secondary">{$t('modal_cancel_btn')}</button>
         </form>
       </div>
     </div>

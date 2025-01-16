@@ -1,7 +1,8 @@
 <script>
   import { page } from '$app/stores';
   import { derived } from 'svelte/store';
-  // @ts-ignore
+  import { t } from 'svelte-i18n'; // Importe a função de tradução
+  //@ts-ignore
   import IoMdHome from 'svelte-icons/io/IoMdHome.svelte';
 
   // Função para gerar breadcrumbs a partir da URL
@@ -19,12 +20,17 @@
           isCurrent: index === segments.length - 1 
         };
       }
+
+      // Traduz o segmento
+      const translatedSegment = $t(decodeURIComponent(segment)) || capitalize(decodeURIComponent(segment));
+
       return { 
-        segment: capitalize(decodeURIComponent(segment)), 
+        segment: translatedSegment, 
         href: '/' + segments.slice(0, index + 1).join('/') + buildQueryString(queryParams), 
         isCurrent: index === segments.length - 1 
       };
     }).filter((/** @type {{ segment: any; }} */ breadcrumb) => breadcrumb.segment); // Filtra breadcrumbs sem segmento
+
     return breadcrumbs;
   }
 

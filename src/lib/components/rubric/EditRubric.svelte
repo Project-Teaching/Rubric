@@ -9,7 +9,8 @@
   import IoMdTrash from "svelte-icons/io/IoMdTrash.svelte";
   // @ts-ignore
   import IoMdRefreshCircle from 'svelte-icons/io/IoMdRefreshCircle.svelte'
-    import Modal from "../Modal.svelte";
+  import Modal from "../Modal.svelte";
+  import { t } from "svelte-i18n";
 
   interface Criterion {
     name: string;
@@ -203,8 +204,11 @@
             saveRubricField(docId, "criteria", r.criteria);
           }
         } else if (field.includes("performance_levels")) {
-          const [_, index, subfield] = field.split(".");
-          // @ts-ignore
+        const [_, index, subfield] = field.split(".");
+          // Verifique se o campo é o 'value' e converta para número, se necessário
+          if (subfield === "value") {
+            value = Number(value);  // Garantir que o valor seja um número
+          }
           r.performance_levels[index][subfield] = value;
           saveRubricField(docId, "performance_levels", r.performance_levels);
         }
@@ -439,6 +443,38 @@
   // CONTROLE DE DRAG AND DROP DE COLUNAS - END
   // CONTROLE DE DRAG AND DROP - END
 
+
+  async function saveAll() {
+    const docRef = doc(db, "rubrics", docId);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      // Pega o valor atual do 'rubric' armazenado no writable
+      rubric.subscribe(async (currentRubric) => {
+        if (currentRubric) {
+          // Se o writable não for nulo, salva os dados no Firestore
+          const updatedData = {
+            ...docSnap.data(), // Obtém os dados existentes no Firestore
+            model_name: currentRubric.model_name,
+            course: currentRubric.course,
+            major: currentRubric.major,
+            criteria: currentRubric.criteria,
+            performance_levels: currentRubric.performance_levels,
+            public: currentRubric.public,
+            version: currentRubric.version,
+            original_model: currentRubric.original_model,
+            finished: currentRubric.finished,
+          };
+
+          // Atualiza o documento no Firestore com os novos dados
+          await updateDoc(docRef, updatedData);
+          console.log("Rubric atualizada com sucesso!");
+        }
+      });
+    } else {
+      console.error("Documento não encontrado!");
+    }
+  }
   onMount(() => {
     fetchRubric(docId);
   });
@@ -449,9 +485,8 @@
     <!-- CONTROLADORES SUPERIORES DA RUBRICA -->
     <div class="flex justify-between mb-4">
       <div>
-        <button class="btn variant-filled-primary ml-2" on:click={addCriterion}
-          >Linha +</button
-        >
+        <button class="btn dark:text-white variant-filled-primary font-bold ml-2" on:click={addCriterion}
+          >{$t('row')} +</button>
         <!--<button
           class="btn variant-filled-secondary mr-2"
           on:click={() => removeCriterion($rubric.criteria.length - 1)}
@@ -470,8 +505,8 @@
       </div>
       <div>
         <button
-          class="btn variant-filled-primary"
-          on:click={addPerformanceLevel}>Coluna +</button
+          class="btn variant-filled-primary dark:text-white font-bold"
+          on:click={addPerformanceLevel}>{$t('column')} +</button
         >
        <!--<button
           class="btn variant-filled-secondary mr-2"
@@ -486,7 +521,7 @@
       <label
         class="input dark:bg-dark-surface border-none flex items-center gap-2 w-[20%]"
       >
-        Nome do Modelo:
+        {$t('model_name')}:
         <input
           id="model_name"
           type="text"
@@ -509,7 +544,7 @@
               class="drag-drop-row-cell border border-tertiary-500 border-solid"
             ></th>
             <!-- PERFORMANCE LEVELS -->
-            <th class="border border-tertiary-500 border-solid">Critério</th>
+            <th class="border border-tertiary-500 border-solid">{$t('criterion')}</th>
             {#each $rubric.performance_levels as level, colIndex}
               <th
                 class="border border-tertiary-500 border-solid p-4"
@@ -560,7 +595,7 @@
                       `performance_levels.${$rubric.performance_levels.indexOf(level)}.value`,
                       e.target?.value,
                     )}
-                /> pontos
+                /> {$t('points')}
               </th>
             {/each}
           </tr>
@@ -636,48 +671,53 @@
       </table>
     </div>
     <!-- TAGS DA RUBRICA -->
-    <div class="flex justify-start">
-      <div class="w-max m-2">
-        Cursos:
-        <TagAutoComplete {docId} field={"major"} />
-      </div>
-      <div class="w-max m-2">
-        Disciplinas:
-        <TagAutoComplete {docId} field={"course"} />
-      </div>
+    <div class="w-max-[100vw] flex justify-between items-center">
+      <div class="flex justify-start">
+        <div class="w-max m-2">
+          {$t('majors')}:
+          <TagAutoComplete {docId} field={"major"} />
+        </div>
+        <div class="w-max m-2">
+          {$t('courses')}:
+          <TagAutoComplete {docId} field={"course"} />
+        </div>
+      </div> 
+      <div class="flex justify-center items-center m-2 ml-5">
+        <button class="btn variant-filled-primary font-bold dark:text-white ml-2" on:click={saveAll}
+        >{$t("edit_rubric_save_btn")}</button>
+      </div> 
     </div>
-
     <!-- Modal para editar descritores -->
     <dialog id="edit_modal" class="modal">
       <div class="modal-box bg-secondary-500 dark:bg-dark-surface p-2">
-        <h3 class="text-lg font-bold mb-2">Editar Descritor</h3>
+        <h3 class="text-lg font-bold mb-2">{$t('edit_rubric_descriptor_modal_title')}</h3>
         <textarea
           id="descriptor_textarea"
           class="textarea textarea-bordered w-full h-32 bg-surface-200 dark:bg-dark-secondary border-none"
-          placeholder="Digite o descritor aqui..."
+          placeholder={$t('edit_rubric_descriptor_modal_placeholder')}
         ></textarea>
         <div class="modal-action">
           <button on:click={saveDescriptor} class="btn bg-primary-500"
-            >Salvar</button
+            >{$t('edit_rubric_descriptor_modal_save_btn')}</button
           >
           <form method="dialog">
             <!-- if there is a button in form, it will close the modal -->
             <button class="btn bg-secondary-500 dark:bg-dark-secondary"
-              >Cancelar</button
+              >{$t('modal_cancel_btn')}</button
             >
           </form>
         </div>
       </div>
     </dialog>
 
-    <Modal modalId={"row_confirm_modal"} modalFunction={confirmRemoveRow} modalTitle="Confirmar Exclusão" modalMessage="Você tem certeza que deseja remover esta linha? Esta ação não pode ser desfeita." modalButton="Confirmar" />
+    <Modal modalId={"row_confirm_modal"} modalFunction={confirmRemoveRow} modalTitle={$t('modal_delete_title')} modalMessage={$t('modal_row_delete_message')} modalButton={$t('modal_confirm_button')} />
 
-    <Modal modalId={"col_confirm_modal"} modalFunction={confirmRemoveColumn} modalTitle="Confirmar Exclusão" modalMessage="Você tem certeza que deseja remover esta coluna? Esta ação não pode ser desfeita." modalButton="Confirmar" />
+    <Modal modalId={"col_confirm_modal"} modalFunction={confirmRemoveColumn} modalTitle={$t('modal_delete_title')} modalMessage={$t('modal_column_delete_message')} modalButton={$t('modal_confirm_button')}  />
 
-    <Modal modalId={"reset_modal"} modalFunction={resetGrid} modalTitle="Confirmar Limpeza" modalMessage="Você tem certeza que deseja limpar a Rubrica? Esta ação não pode ser desfeita. Todos os dados da matriz serão perdidos e a rubrica retornará a ser 3 linhas por 5 colunas." modalButton="Confirmar" />
+    <Modal modalId={"reset_modal"} modalFunction={resetGrid} modalTitle={$t('modal_clean_title')} modalMessage={$t('modal_clean_message')} modalButton={$t('modal_confirm_button')} />
   </div>
 {:else}
-  <p>Carregando rubrica...</p>
+  <p>{$t('loading_rubric')}</p>
 {/if}
 
 <style>
