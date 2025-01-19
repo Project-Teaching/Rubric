@@ -87,6 +87,9 @@
     "student_add": "Adicionar Aluno",
     "tour_step_1": "Bem vindo ao RubricPro, um sistema de criação e gerenciamento de rubricas de avaliação. Vamos começar o tour?",
     "tour_step_2": "Clicando aqui você verá seu gerenciador de rubricas.",
+    "tour_step_3": "Clicando aqui você pode alterar o idioma do sistema.",
+    "tour_step_4": "Clicando aqui você pode alterar o tema do sistema.",
+    "tour_step_5": "Clicando aqui você pode acessar o menu lateral de navegação.",
     "english": "Inglês",
     "portuguese": "Português",
     "spanish": "Espanhol"

@@ -1,55 +1,104 @@
-<script>
+<script lang="ts">
   import NavBar from "$lib/components/NavBar.svelte";
   import Footer from "$lib/components/Footer.svelte";
   import Drawer from "$lib/components/Drawer.svelte";
   import { onMount } from "svelte";
   import Shepherd from 'shepherd.js';
   import { t } from 'svelte-i18n';
+  import { tick } from 'svelte';
 
   let tour;
+  
+  const startTour = async () => {
 
-  onMount(() => {
-
-      // Configuração do tour
-      tour = new Shepherd.Tour({
-        defaultStepOptions: {
-          classes: 'dark:text-white shadow-md bg-surface-500 text-black',
-          scrollTo: true
-        },
-        useModalOverlay: true
-      });
-
-      tour.addStep({
-      id: 'step-1',
-      text: $t('tour_step_1'),
-      attachTo: {
-        element: '.p-content',
-        on: 'bottom'
+    tour = new Shepherd.Tour({
+      defaultStepOptions: {
+        classes: "dark:text-white shadow-md bg-surface-500 text-black",
+        scrollTo: true,
       },
-      buttons: [
-        {
-          text: 'Próximo',
-          action: tour.next
-        }
-      ]
+      useModalOverlay: true,
     });
 
     tour.addStep({
-      id: 'step-2',
-      text: $t('tour_step_2'),
+      id: "step-1",
+      text: $t("tour_step_1"),
       attachTo: {
-        element: '.rubric-model-preview-text',
-        on: 'bottom'
+        element: ".p-content",
+        on: "bottom",
       },
       buttons: [
         {
-          text: 'Próximo',
-          action: tour.next
-        }
-      ]
+          text: "Próximo",
+          action: tour.next,
+        },
+      ],
     });
 
-    //tour.start();
+    tour.addStep({
+      id: "step-2",
+      text: $t("tour_step_2"),
+      attachTo: {
+        element: ".rubric-model-preview-text",
+        on: "bottom",
+      },
+      buttons: [
+        {
+          text: "Próximo",
+          action: tour.next,
+        },
+      ],
+    });
+
+    tour.addStep({
+      id: "step-3",
+      text: $t("tour_step_3"),
+      attachTo: {
+        element: "#language-dropdown",
+        on: "bottom",
+      },
+      buttons: [
+        {
+          text: "Próximo",
+          action: tour.next,
+        },
+      ],
+    });
+
+    tour.addStep({
+      id: "step-4",
+      text: $t("tour_step_4"),
+      attachTo: {
+        element: "#theme-switcher",
+        on: "bottom",
+      },
+      buttons: [
+        {
+          text: "Próximo",
+          action: tour.next,
+        },
+      ],
+    });
+
+    tour.addStep({
+      id: "step-5",
+      text: $t("tour_step_5"),
+      attachTo: {
+        element: ".drawer-button",
+        on: "right",
+      },
+      buttons: [
+        {
+          text: "Próximo",
+          action: tour.next,
+        },
+      ],
+    });
+
+    tour.start();
+  };
+
+  onMount(() => {
+    startTour(); // Inicia o tour após a montagem
   });
 </script>
 
