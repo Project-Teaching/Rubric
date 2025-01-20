@@ -9,6 +9,10 @@
   import { doc, deleteDoc } from 'firebase/firestore';
   import { db } from '$lib/firebase'; // Ajuste o caminho conforme sua configuração
   import { t } from 'svelte-i18n';
+  import Shepherd from 'shepherd.js';
+    import { onMount } from 'svelte';
+
+  let tour: any;
 
   let rubricas: { 
         id: string, uid: string, major: string, course: string, performance_levels:any[], criteria: any[], model_name: string, version: number, public: boolean, original_model: string, finished: boolean
@@ -69,6 +73,135 @@
       }
     }
   }
+
+  const startTour = async () => {
+    
+    tour = new Shepherd.Tour({
+      defaultStepOptions: {
+        classes: "dark:text-white shadow-md bg-surface-500 text-black",
+        scrollTo: true,
+      },
+      useModalOverlay: true,
+    });
+
+    tour.addStep({
+      id: "rmanager_step-1",
+      text: $t("rmanager_tour_step_1"),
+      attachTo: {
+        element: "#rm_title",
+        on: "right",
+      },
+      buttons: [
+        {
+          text: $t("tour_finish"),
+          action: tour.complete,
+        },
+        {
+          text: $t("tour_next"),
+          action: tour.next,
+        }
+      ],
+    });
+
+    tour.addStep({
+      id: "rmanager_step-2",
+      text: $t("rmanager_tour_step_2"),
+      attachTo: {
+        element: "#search_rm_btn",
+        on: "bottom",
+      },
+      buttons: [
+        {
+          text: $t("tour_back"),
+          action: tour.back,
+        },
+        {
+          text: $t("tour_finish"),
+          action: tour.complete,
+        },
+        {
+          text: $t("tour_next"),
+          action: tour.next,
+        }
+      ],
+    });
+
+    tour.addStep({
+      id: "rmanager_step-3",
+      text: $t("rmanager_tour_step_3"),
+      attachTo: {
+        element: "#r_remove_btn",
+        on: "right",
+      },
+      buttons: [
+        {
+          text: $t("tour_back"),
+          action: tour.back,
+        },
+        {
+          text: $t("tour_finish"),
+          action: tour.complete,
+        },
+        {
+          text: $t("tour_next"),
+          action: tour.next,
+        }
+      ],
+    });
+
+    tour.addStep({
+      id: "rmanager_step-4",
+      text: $t("rmanager_tour_step_4"),
+      attachTo: {
+        element: "#r_edit_btn",
+        on: "right",
+      },
+      buttons: [
+        {
+          text: $t("tour_back"),
+          action: tour.back,
+        },
+        {
+          text: $t("tour_finish"),
+          action: tour.complete,
+        },
+        {
+          text: $t("tour_next"),
+          action: tour.next,
+        }
+      ],
+    });
+
+    tour.addStep({
+      id: "rmanager_step-5",
+      text: $t("rmanager_tour_step_5"),
+      attachTo: {
+        element: "#r_create_btn",
+        on: "top",
+      },
+      buttons: [
+        {
+          text: $t("tour_lets_go"),
+          action: async () => { 
+          tour.complete();
+          await goto('/rubricas/criar modelo?tour_active=true');
+          },
+        },
+        {
+          text: $t("tour_skip"),
+          action: tour.complete,
+        },
+      ],
+    });
+
+    tour.start();
+  };
+
+  onMount(() => {
+    if ($page.url.searchParams.get('tour_active')) {
+        startTour();
+    }
+  });
 </script>
 
 <svelte:head>
@@ -84,7 +217,7 @@
       <div class="drawer-content">
         <!-- Conteúdo principal aqui -->
         <div class="h-2 flex justify-center"> <!-- Bloco de Texto Principal 1 -->
-          <h1 class="text-2xl font-bold text-primary-500">{$t('rubric_manager_title1')}</h1>
+          <h1 id="rm_title" class="h-8 text-2xl font-bold text-primary-500">{$t('rubric_manager_title1')}</h1>
         </div>
         <section class="container mx-auto mt-10">
           <!-- svelte-ignore a11y-missing-content -->
@@ -98,7 +231,7 @@
           {/if}
         
           <div class="flex justify-center mb-5">
-            <button class="btn variant-filled-primary text-white dark:text-white py-2 px-4 rounded">{$t('rubric_manager_search_btn')}</button>
+            <button class="btn variant-filled-primary text-white dark:text-white py-2 px-4 rounded" id="search_rm_btn">{$t('rubric_manager_search_btn')}</button>
           </div>
         
           <div class="flex flex-wrap gap-8 items-center justify-center">
@@ -112,10 +245,10 @@
                       #20 Avaliações
                     </div>
                     <div class="flex flex-col items-end inset-0 ml-4 gap-y-4">
-                      <button on:click={() => abrirModal(rubrica.id)} class="pb-1 bg-error-500 hover:bg-error-900 w-8 h-8 text-white rounded-full">
+                      <button id="r_remove_btn" on:click={() => abrirModal(rubrica.id)} class="pb-1 bg-error-500 hover:bg-error-900 w-8 h-8 text-white rounded-full">
                         <span class="text-xl font-bold">x</span>
                       </button>
-                      <button on:click={() => editarRubrica(rubrica.id)} class="btn variant-filled-primary text-white dark:text-white w-12 h-12 rounded-full flex items-center justify-center">
+                      <button id="r_edit_btn" on:click={() => editarRubrica(rubrica.id)} class="btn variant-filled-primary text-white dark:text-white w-12 h-12 rounded-full flex items-center justify-center">
                         <span class="text-2xl font-bold">+</span>
                       </button>
                     </div>
@@ -131,7 +264,7 @@
               <div class="bg-secondary-500 dark:bg-dark-secondary h-32 m-3 rounded-lg shadow-md hover-up">
                 <div class="flex justify-end items-end m-4 inset-0">
                   <div class="mt-12">
-                    <button on:click={criarNovaRubrica} class="bg-primary-500 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg">
+                    <button id="r_create_btn" on:click={criarNovaRubrica} class="bg-primary-500 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg">
                       <span class="text-2xl font-bold">+</span>
                     </button>
                   </div>

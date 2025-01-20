@@ -485,7 +485,7 @@
     <!-- CONTROLADORES SUPERIORES DA RUBRICA -->
     <div class="flex justify-between mb-4">
       <div>
-        <button class="btn dark:text-white variant-filled-primary font-bold ml-2" on:click={addCriterion}
+        <button id="row_add_btn" class="btn dark:text-white variant-filled-primary font-bold ml-2" on:click={addCriterion}
           >{$t('row')} +</button>
         <!--<button
           class="btn variant-filled-secondary mr-2"
@@ -495,6 +495,7 @@
       </div>
       <div>
         <button
+          id="reset_grid_rubric_btn"
           class="btn variant-filled-error hover:bg-error-800 hover-up ml-2 mt-2 rounded-full p-2"
           title="Resetar Grid"
           on:click={openResetModal}>                    
@@ -505,6 +506,7 @@
       </div>
       <div>
         <button
+          id="column_add_btn"
           class="btn variant-filled-primary dark:text-white font-bold"
           on:click={addPerformanceLevel}>{$t('column')} +</button
         >
@@ -517,7 +519,7 @@
       </div>
     </div>
     <!-- INFORMAÇÕES DA RUBRICA -->
-    <div class="flex justify-start">
+    <div class="flex justify-start" id="rubric_model_name_label">
       <label
         class="input dark:bg-dark-surface border-none flex items-center gap-2 w-[20%]"
       >
@@ -557,8 +559,9 @@
                 on:drop={onDropColumn}
               >
                 <div class="flex flex-row flex-nowrap justify-between items-center cursor-grab w-full h-4 mb-2">
-                    <span class="text-xl font-semibold text-center text-black dark:text-white cursor-grab">≡</span>
+                    <span id="grab_drop_btn_column" class="text-xl font-semibold text-center text-black dark:text-white cursor-grab">≡</span>
                     <div
+                    id="delete_column_btn"
                     class="hover:text-error-500 w-5"
                     role="button"
                     tabindex="0"
@@ -573,6 +576,7 @@
                   </div>
                 </div>
                 <input
+                  id="performance_level_input"
                   class="grow bg-surface-500 dark:bg-dark-surface p-1 text-lg rounded-md max-h-7 text-center max-w-48"
                   type="text"
                   value={level.name}
@@ -585,6 +589,7 @@
                 />
                 <br />
                 <input
+                  id="performance_level_value_input"
                   class="grow bg-surface-500 dark:bg-dark-surface text-lg rounded-md max-h-7 text-center max-w-16 mt-1"
                   type="number"
                   min="0"
@@ -637,6 +642,7 @@
               <!-- Ícone de drag-and-drop -->
               <td class="border border-tertiary-500 border-solid p-2">
                 <input
+                  id="criterion_input"
                   class="grow bg-secondary-500 dark:bg-dark-secondary p-1 text-lg rounded-md max-h-7 text-center font-medium"
                   type="text"
                   value={criterion.name}
@@ -653,6 +659,7 @@
                   class="border border-tertiary-500 border-solid p-0.5 max-w-32 min-w-32 break-words"
                 >
                   <div
+                    id="descriptor_cell"
                     class="w-full min-h-20 max-h-20 p-0.5 overflow-auto text-center text-sm bg-secondary-500 dark:bg-dark-secondary font-medium"
                     role="button"
                     tabindex="0"
@@ -672,7 +679,7 @@
     </div>
     <!-- TAGS DA RUBRICA -->
     <div class="w-max-[100vw] flex justify-between items-center">
-      <div class="flex justify-start">
+      <div class="flex justify-start" id="rubric_tags_label">
         <div class="w-max m-2">
           {$t('majors')}:
           <TagAutoComplete {docId} field={"major"} />
@@ -683,7 +690,7 @@
         </div>
       </div> 
       <div class="flex justify-center items-center m-2 ml-5">
-        <button class="btn variant-filled-primary font-bold dark:text-white ml-2" on:click={saveAll}
+        <button id="save_model_rubric_btn" class="btn variant-filled-primary font-bold dark:text-white ml-2" on:click={saveAll}
         >{$t("edit_rubric_save_btn")}</button>
       </div> 
     </div>

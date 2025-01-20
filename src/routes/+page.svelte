@@ -6,8 +6,9 @@
   import Shepherd from 'shepherd.js';
   import { t } from 'svelte-i18n';
   import { tick } from 'svelte';
+  import { goto } from "$app/navigation";
 
-  let tour;
+  let tour: any;
   
   const startTour = async () => {
 
@@ -28,9 +29,13 @@
       },
       buttons: [
         {
-          text: "Próximo",
-          action: tour.next,
+          text: $t("tour_finish"),
+          action: tour.complete,
         },
+        {
+          text: $t("tour_next"),
+          action: tour.next,
+        }
       ],
     });
 
@@ -38,14 +43,22 @@
       id: "step-2",
       text: $t("tour_step_2"),
       attachTo: {
-        element: ".rubric-model-preview-text",
+        element: ".drawer-button",
         on: "bottom",
       },
       buttons: [
         {
-          text: "Próximo",
-          action: tour.next,
+          text: $t("tour_back"),
+          action: tour.back,
         },
+        {
+          text: $t("tour_finish"),
+          action: tour.complete,
+        },
+        {
+          text: $t("tour_next"),
+          action: tour.next,
+        }
       ],
     });
 
@@ -58,9 +71,17 @@
       },
       buttons: [
         {
-          text: "Próximo",
-          action: tour.next,
+          text: $t("tour_back"),
+          action: tour.back,
         },
+        {
+          text: $t("tour_finish"),
+          action: tour.complete,
+        },
+        {
+          text: $t("tour_next"),
+          action: tour.next,
+        }
       ],
     });
 
@@ -73,24 +94,39 @@
       },
       buttons: [
         {
-          text: "Próximo",
-          action: tour.next,
+          text: $t("tour_back"),
+          action: tour.back,
         },
+        {
+          text: $t("tour_finish"),
+          action: tour.complete,
+        },
+        {
+          text: $t("tour_next"),
+          action: tour.next,
+        }
       ],
     });
-
+  
     tour.addStep({
       id: "step-5",
       text: $t("tour_step_5"),
       attachTo: {
-        element: ".drawer-button",
-        on: "right",
+      element: ".rubric-model-preview-text",
+      on: "right",
       },
       buttons: [
-        {
-          text: "Próximo",
-          action: tour.next,
+      {
+        text: $t("tour_lets_go"),
+        action: async () => { 
+        tour.complete();
+        await goto("/rubricas?tour_active=true");
         },
+      },
+      {
+        text: $t("tour_skip"),
+        action: tour.complete,
+      },
       ],
     });
 

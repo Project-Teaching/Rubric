@@ -18,6 +18,8 @@
   import FaBell from "svelte-icons/fa/FaBell.svelte";
   import Modal from "$lib/components/Modal.svelte";
   import { t } from 'svelte-i18n';
+  import Shepherd from "shepherd.js";
+  import { onMount } from "svelte";
   
   let classes: {
     course_id: string;
@@ -64,6 +66,7 @@
   let class_id: string;
   let value: boolean = false;
   let evaluationToRemove: string | null = null;
+  let tour: any;
 
   $: {
     if ($page.data) {
@@ -139,6 +142,228 @@
     // Navegar para a página de novo aluno, incluindo class_id como parâmetro da URL
     goto(`/cursos/${course_name}/novo aluno?class_id=${class_id}`);
   }
+
+  
+  const startTour = async () => {
+    
+    tour = new Shepherd.Tour({
+      defaultStepOptions: {
+        classes: "dark:text-white shadow-md bg-surface-500 text-black",
+        scrollTo: true,
+      },
+      useModalOverlay: true,
+    });
+
+    tour.addStep({
+      id: "course_step-1",
+      text: $t("course_tour_step_1"),
+      attachTo: {
+        element: "#course_title_manager",
+        on: "right",
+      },
+      buttons: [
+        {
+          text: $t("tour_finish"),
+          action: tour.complete,
+        },
+        {
+          text: $t("tour_next"),
+          action: tour.next,
+        }
+      ],
+    });
+
+    tour.addStep({
+      id: "course_step-2",
+      text: $t("course_tour_step_2"),
+      attachTo: {
+        element: "#table_switcher",
+        on: "top",
+      },
+      buttons: [
+        {
+          text: $t("tour_back"),
+          action: tour.back,
+        },
+        {
+          text: $t("tour_finish"),
+          action: tour.complete,
+        },
+        {
+          text: $t("tour_next"),
+          action: tour.next,
+        }
+      ],
+    });
+
+    tour.addStep({
+      id: "course_step-3",
+      text: $t("course_tour_step_3"),
+      attachTo: {
+        element: "#evaluation_table",
+        on: "top",
+      },
+      buttons: [
+        {
+          text: $t("tour_back"),
+          action: tour.back,
+        },
+        {
+          text: $t("tour_finish"),
+          action: tour.complete,
+        },
+        {
+          text: $t("tour_next"),
+          action: tour.next,
+        }
+      ],
+    });
+
+    tour.addStep({
+      id: "course_step-4",
+      text: $t("course_tour_step_4"),
+      attachTo: {
+        element: "#progress_area",
+        on: "top",
+      },
+      buttons: [
+        {
+          text: $t("tour_back"),
+          action: tour.back,
+        },
+        {
+          text: $t("tour_finish"),
+          action: tour.complete,
+        },
+        {
+          text: $t("tour_next"),
+          action: tour.next,
+        }
+      ],
+    });
+
+    tour.addStep({
+      id: "course_step-5",
+      text: $t("course_tour_step_5"),
+      attachTo: {
+        element: "#actions_area",
+        on: "top",
+      },
+      buttons: [
+        {
+          text: $t("tour_back"),
+          action: tour.back,
+        },
+        {
+          text: $t("tour_finish"),
+          action: tour.complete,
+        },
+        {
+          text: $t("tour_next"),
+          action: tour.next,
+        }
+      ],
+    });
+
+    tour.addStep({
+      id: "course_step-6",
+      text: $t("course_tour_step_6"),
+      attachTo: {
+        element: "#evaluation_notify",
+        on: "top",
+      },
+      buttons: [
+        {
+          text: $t("tour_back"),
+          action: tour.back,
+        },
+        {
+          text: $t("tour_finish"),
+          action: tour.complete,
+        },
+        {
+          text: $t("tour_next"),
+          action: tour.next,
+        }
+      ],
+    });
+
+    tour.addStep({
+      id: "course_step-7",
+      text: $t("course_tour_step_7"),
+      attachTo: {
+        element: "#evaluation_remove",
+        on: "top",
+      },
+      buttons: [
+        {
+          text: $t("tour_back"),
+          action: tour.back,
+        },
+        {
+          text: $t("tour_finish"),
+          action: tour.complete,
+        },
+        {
+          text: $t("tour_next"),
+          action: tour.next,
+        }
+      ],
+    });
+
+    tour.addStep({
+      id: "course_step-8",
+      text: $t("course_tour_step_8"),
+      attachTo: {
+        element: "#model_view",
+        on: "top",
+      },
+      buttons: [
+        {
+          text: $t("tour_back"),
+          action: tour.back,
+        },
+        {
+          text: $t("tour_finish"),
+          action: tour.complete,
+        },
+        {
+          text: $t("tour_next"),
+          action: tour.next,
+        }
+      ],
+    });
+
+    tour.addStep({
+      id: "course_step-9",
+      text: $t("course_tour_step_9"),
+      attachTo: {
+        element: "#evaluation_view",
+        on: "top",
+      },
+      buttons: [
+        {
+          text: $t("tour_lets_go"),
+          action: async () => { 
+          tour.complete();
+          await goto('/cursos/Teoria%20da%20Computação/avaliações?class_id=YwPKmwoqCwGzzcREmGTZ&evaluation_id=sYhdd9SJVCDzdKqsZ9QI&tour_active=true');
+          },
+        },
+        {
+          text: $t("tour_skip"),
+          action: tour.complete,
+        },
+      ],
+    });
+
+    tour.start();
+  };
+
+  onMount(() => {
+    if ($page.url.searchParams.get('tour_active')) {
+        startTour();
+    }
+  });
 </script>
 
 <svelte:head>
@@ -155,7 +380,7 @@
         <!-- Conteúdo principal aqui -->
         <div class="h-2 flex justify-center text-center">
           <!-- Bloco de Texto Principal 1 -->
-          <h1 class="text-2xl font-bold text-primary-500">
+          <h1 id="course_title_manager" class="h-8 text-2xl font-bold text-primary-500">
             {$t('course')} - {course_name} <br />
             {classes.course_semester}. {$t('semester')} - {classes.course_year}
           </h1>
@@ -163,7 +388,7 @@
         <section class="container mx-auto mt-20 mb-10 min-h-[50vh]">
           <!-- Responsive Container (recommended) -->
           <div class="table-container">
-            <div class="w-full mb-2 flex justify-between flex-nowrap">
+            <div id="table_switcher" class="w-full mb-2 flex justify-between flex-nowrap">
               <p class="text-primary-500 font-bold text-lg">
                 {#if value == true}
                   {$t('alumn_list')}
@@ -247,13 +472,13 @@
               </table>
             {:else}
               <!-- Native Table Element -->
-              <table class="table table-hover bg-gray-100 dark:bg-stone-800">
+              <table id="evaluation_table" class="table table-hover bg-gray-100 dark:bg-stone-800">
                 <thead>
                   <tr class="bg-secondary-500 dark:bg-dark-secondary">
                     <th>{$t('evaluations_table_evaluation_name')}</th>
                     <th>{$t('evaluations_table_evaluation_date')}</th>
-                    <th>{$t('evaluations_table_actions')}</th>
-                    <th>{$t('evaluations_table_evaluation_progress')}</th>
+                    <th id="actions_area">{$t('evaluations_table_actions')}</th>
+                    <th id="progress_area">{$t('evaluations_table_evaluation_progress')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -265,23 +490,27 @@
                         <td>
                           <div class="flex items-center flex-nowrap">
                             <button
+                              id="evaluation_view"
                               class="w-5 h-5 text-primary-500 hover:text-primary-300 mr-3"
                               on:click={() => openEvaluationPage(evaluation.id)}
                             >
                               <FaRegListAlt />
                             </button>
                             <button
+                              id="model_view"
                               class="w-5 h-5 text-green-600 dark:text-green-400 hover:text-green-400 dark:hover:text-green-200 mr-3"
                             >
                               <FaEye />
                             </button>
                             <button
+                              id="evaluation_remove"
                               on:click={() => abrirModalRE(evaluation.id)}
                               class="w-5 h-5 text-red-700 hover:text-red-500 mr-3"
                             >
                               <FaTrashAlt />
                             </button>
                             <button
+                              id="evaluation_notify"
                               class="w-5 h-5 text-cyan-600 dark:text-cyan-400 hover:text-cyan-400 dark:hover:text-cyan-200"
                             >
                               <FaBell />

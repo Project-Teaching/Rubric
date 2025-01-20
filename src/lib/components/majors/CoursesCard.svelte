@@ -7,7 +7,7 @@
     }
 </script>
 
-<div class="flex flex-col h-44 w-[25vw]">
+<div id="course_card_div" class="flex flex-col h-44 w-[25vw]">
     <div 
     class="bg-secondary-500 dark:bg-dark-secondary h-36 m-3 rounded-lg shadow-md hover-up"
     role="button" 
