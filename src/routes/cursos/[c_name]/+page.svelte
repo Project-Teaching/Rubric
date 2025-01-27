@@ -16,6 +16,8 @@
   import FaTrashAlt from "svelte-icons/fa/FaTrashAlt.svelte";
   // @ts-ignore
   import FaBell from "svelte-icons/fa/FaBell.svelte";
+  // @ts-ignore
+  import IoIosPeople from 'svelte-icons/io/IoIosPeople.svelte'
   import Modal from "$lib/components/Modal.svelte";
   import { t } from 'svelte-i18n';
   import Shepherd from "shepherd.js";
@@ -135,6 +137,12 @@
     // Navegar para a página de avaliações, incluindo class_id e evaluation_id como parâmetros da URL
     goto(
       `/cursos/${course_name}/avaliações?class_id=${class_id}&evaluation_id=${id}`
+    );
+  }
+
+  async function openGroupPage() {
+    goto(
+      `/cursos/${course_name}/grupos?class_id=${class_id}`
     );
   }
 
@@ -385,7 +393,7 @@
             {classes.course_semester}. {$t('semester')} - {classes.course_year}
           </h1>
         </div>
-        <section class="container mx-auto mt-20 mb-10 min-h-[50vh]">
+        <section class="container mx-auto mt-20 mb-10 min-h-[60vh]">
           <!-- Responsive Container (recommended) -->
           <div class="table-container">
             <div id="table_switcher" class="w-full mb-2 flex justify-between flex-nowrap">
@@ -396,6 +404,12 @@
                   {$t('evaluation_list')}
                 {/if}
               </p>
+              <button
+              class="ml-16 w-10 h-10 bg-blue-600 rounded-xl text-white hover:bg-blue-500 hover:text-gray-300"
+              on:click={() => openGroupPage()}
+              >
+                <IoIosPeople />
+              </button>
               <div class="flex items-center">
                 <p class="font-bold text-md mr-2">
                   {#if value == true}
@@ -412,6 +426,7 @@
                   bind:checked={value}
                 ></SlideToggle>
               </div>
+              
             </div>
             {#if value == true}
               <!-- Native Table Element -->
