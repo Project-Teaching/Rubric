@@ -13,8 +13,15 @@ export const load: PageServerLoad = async ({ locals }) => {
         // Carrega os modelos de rubricas do usuário
         const rubricasSnapshot = await adminDB.collection('rubrics').where('uid', '==', uid).get();
         const rubricasData = rubricasSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+        // Carrega as rubricas públicas
+        const publicRubricasSnapshot = await adminDB.collection('rubrics').where('public', '==', true).get();
+        const publicRubricasData = publicRubricasSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
         return {
-            rubricas: rubricasData
+            rubricas: rubricasData,
+            publicRubricas: publicRubricasData,
+            userID: uid // Passa o userID para o cliente
         };
     } catch (err) {
         console.error('Erro ao carregar rubricas:', err);
