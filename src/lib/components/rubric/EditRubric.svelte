@@ -54,7 +54,7 @@
     document.getElementById("edit_modal")?.showModal();
   }
 
-    // Função para abrir o modal de reset do grid
+  // Função para abrir o modal de reset do grid
   function openResetModal() {
     // @ts-ignore
     document.getElementById("reset_modal")?.showModal();
@@ -178,6 +178,18 @@
     if (docSnap.exists()) {
       const data = docSnap.data();
       const updatedData = { ...data, [field]: value };
+
+      // Garantir que todos os campos obrigatórios estão definidos
+      if (updatedData.public === undefined) {
+        updatedData.public = false;
+      }
+      if (updatedData.version === undefined) {
+        updatedData.version = 1;
+      }
+      if (updatedData.finished === undefined) {
+        updatedData.finished = false;
+      }
+
       await updateDoc(docRef, updatedData);
     } else {
       console.error("Documento não encontrado!");
@@ -529,14 +541,12 @@
           type="text"
           class="grow bg-secondary-500 dark:bg-dark-secondary p-1 text-lg rounded-md max-h-7"
           value={$rubric.model_name}
-          on:keydown={(e) =>
-            e.key === "Enter" &&
-            handleFieldChange("model_name", e.target?.value)}
+          on:input={(e) => handleFieldChange("model_name", e.target.value)}
         />
       </label>
     </div>
     <!-- MATRIZ DA RUBRICA -->
-    <div class="max-w-[100vw] max-h-[68vh] overflow-x-auto overflow-y-auto">
+    <div class="max-w-[100%] max-h-[68vh] overflow-x-auto overflow-y-auto">
       <table class="table-fixed border-collapse mt-5">
         <thead
           class="table-header-group bg-secondary-500 dark:bg-dark-secondary text-md"
