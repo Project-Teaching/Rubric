@@ -40,6 +40,7 @@
     class_id: string;
     professor_id: any[];
     rubric_model_id: string;
+    group_evaluation: boolean;
     evaluation_result: evaluation_results[];
   }[];
 
@@ -137,6 +138,12 @@
     // Navegar para a página de avaliações, incluindo class_id e evaluation_id como parâmetros da URL
     goto(
       `/cursos/${course_name}/avaliações?class_id=${class_id}&evaluation_id=${id}`
+    );
+  }
+
+  async function openGroupEvaluationPage(id: string) {
+    goto(
+      `/cursos/${course_name}/grupos/avaliações?class_id=${class_id}&evaluation_id=${id}&group_evaluation=true`
     );
   }
 
@@ -504,13 +511,22 @@
                         <td>{evaluation.evaluation_date}</td>
                         <td>
                           <div class="flex items-center flex-nowrap">
-                            <button
-                              id="evaluation_view"
-                              class="w-5 h-5 text-primary-500 hover:text-primary-300 mr-3"
-                              on:click={() => openEvaluationPage(evaluation.id)}
-                            >
-                              <FaRegListAlt />
-                            </button>
+                            {#if evaluation.group_evaluation}
+                              <button
+                                class="w-5 h-5 text-primary-500 hover:text-primary-300 mr-3"
+                                on:click={() => openGroupEvaluationPage(evaluation.id)}
+                              >
+                                <IoIosPeople />
+                              </button>
+                            {:else}
+                              <button
+                                id="evaluation_view"
+                                class="w-5 h-5 text-primary-500 hover:text-primary-300 mr-3"
+                                on:click={() => openEvaluationPage(evaluation.id)}
+                              >
+                                <FaRegListAlt />
+                              </button>
+                            {/if}
                             <button
                               id="model_view"
                               class="w-5 h-5 text-green-600 dark:text-green-400 hover:text-green-400 dark:hover:text-green-200 mr-3"
