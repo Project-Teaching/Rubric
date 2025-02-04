@@ -1,5 +1,11 @@
 <script lang="ts">
-  import { doc, getDoc, updateDoc } from "firebase/firestore";
+  import {
+    doc,
+    getDoc,
+    updateDoc,
+    addDoc,
+    collection,
+  } from "firebase/firestore";
   import { db } from "$lib/firebase";
   import { onMount } from "svelte";
   import { writable } from "svelte/store";
@@ -8,7 +14,7 @@
   // @ts-ignore
   import IoMdTrash from "svelte-icons/io/IoMdTrash.svelte";
   // @ts-ignore
-  import IoMdRefreshCircle from 'svelte-icons/io/IoMdRefreshCircle.svelte'
+  import IoMdRefreshCircle from "svelte-icons/io/IoMdRefreshCircle.svelte";
   import Modal from "../Modal.svelte";
   import { t } from "svelte-i18n";
 
@@ -45,7 +51,7 @@
     descriptorIndex = dIndex;
     criterionIndex = cIndex;
     const textarea = document.getElementById(
-      "descriptor_textarea",
+      "descriptor_textarea"
     ) as HTMLTextAreaElement;
     if ($rubric) {
       textarea.value = $rubric.criteria[cIndex].descriptors[dIndex];
@@ -54,10 +60,22 @@
     document.getElementById("edit_modal")?.showModal();
   }
 
-    // Função para abrir o modal de reset do grid
+  // Função para abrir o modal de reset do grid
   function openResetModal() {
     // @ts-ignore
     document.getElementById("reset_modal")?.showModal();
+  }
+
+  // Função para abrir o modal de publicação
+  function openPublishModal() {
+    // @ts-ignore
+    document.getElementById("publish_modal")?.showModal();
+  }
+
+    // Função para abrir o modal de aviso de edição
+    function openEditWarningModal() {
+    // @ts-ignore
+    document.getElementById("edit_warning_modal")?.showModal();
   }
 
   // CONTROLADORES LINHAS
@@ -140,7 +158,7 @@
   async function saveDescriptor() {
     if (descriptorIndex !== null && criterionIndex !== null) {
       const textarea = document.getElementById(
-        "descriptor_textarea",
+        "descriptor_textarea"
       ) as HTMLTextAreaElement;
       const newDescriptor = textarea.value;
 
@@ -204,10 +222,10 @@
             saveRubricField(docId, "criteria", r.criteria);
           }
         } else if (field.includes("performance_levels")) {
-        const [_, index, subfield] = field.split(".");
+          const [_, index, subfield] = field.split(".");
           // Verifique se o campo é o 'value' e converta para número, se necessário
           if (subfield === "value") {
-            value = Number(value);  // Garantir que o valor seja um número
+            value = Number(value); // Garantir que o valor seja um número
           }
           r.performance_levels[index][subfield] = value;
           saveRubricField(docId, "performance_levels", r.performance_levels);
@@ -435,14 +453,16 @@
         });
 
         // Despachando evento para atualizar a UI
-        dispatch("sort", { criteria: newCriterions, performance_levels: newPerformanceLevels });
+        dispatch("sort", {
+          criteria: newCriterions,
+          performance_levels: newPerformanceLevels,
+        });
       }
       return r;
     });
   }
   // CONTROLE DE DRAG AND DROP DE COLUNAS - END
   // CONTROLE DE DRAG AND DROP - END
-
 
   async function saveAll() {
     const docRef = doc(db, "rubrics", docId);
@@ -460,21 +480,56 @@
             major: currentRubric.major,
             criteria: currentRubric.criteria,
             performance_levels: currentRubric.performance_levels,
-            public: currentRubric.public,
+            public: false, // Não está pública enquanto em edição
             version: currentRubric.version,
             original_model: currentRubric.original_model,
-            finished: currentRubric.finished,
+            finished: false, // Não está finalizada enquanto em edição
           };
 
           // Atualiza o documento no Firestore com os novos dados
           await updateDoc(docRef, updatedData);
           console.log("Rubric atualizada com sucesso!");
+          // Fecha o modal de aviso de edição
+          // @ts-ignore
+          document.getElementById("edit_warning_modal")?.close();
         }
       });
     } else {
       console.error("Documento não encontrado!");
     }
   }
+
+  async function publishRubric() {
+    const docRef = doc(db, "rubrics", docId);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      const newVersion = data.version + 1;
+
+      // Cria uma nova rubrica com a nova versão
+      const newRubric = {
+        ...data,
+        version: newVersion,
+        public: true,
+        finished: true,
+        original_model: docId,
+      };
+
+      await addDoc(collection(db, "rubrics"), newRubric);
+
+      // Atualiza a rubrica atual para não ser mais utilizada
+      await updateDoc(docRef, { public: true, finished: false });
+
+      console.log("Rubrica publicada com sucesso!");
+          // Fecha o modal de publicação
+      // @ts-ignore
+      document.getElementById("publish_modal")?.close();
+    } else {
+      console.error("Documento não encontrado!");
+    }
+  }
+
   onMount(() => {
     fetchRubric(docId);
   });
@@ -485,8 +540,11 @@
     <!-- CONTROLADORES SUPERIORES DA RUBRICA -->
     <div class="flex justify-between mb-4">
       <div>
-        <button id="row_add_btn" class="btn dark:text-white variant-filled-primary font-bold ml-2" on:click={addCriterion}
-          >{$t('row')} +</button>
+        <button
+          id="row_add_btn"
+          class="btn dark:text-white variant-filled-primary font-bold ml-2"
+          on:click={addCriterion}>{$t("row")} +</button
+        >
         <!--<button
           class="btn variant-filled-secondary mr-2"
           on:click={() => removeCriterion($rubric.criteria.length - 1)}
@@ -498,7 +556,8 @@
           id="reset_grid_rubric_btn"
           class="btn variant-filled-error hover:bg-error-800 hover-up ml-2 mt-2 rounded-full p-2"
           title="Resetar Grid"
-          on:click={openResetModal}>                    
+          on:click={openResetModal}
+        >
           <div class="w-8 hover-up hover:text-white">
             <IoMdRefreshCircle />
           </div>
@@ -508,9 +567,9 @@
         <button
           id="column_add_btn"
           class="btn variant-filled-primary dark:text-white font-bold"
-          on:click={addPerformanceLevel}>{$t('column')} +</button
+          on:click={addPerformanceLevel}>{$t("column")} +</button
         >
-       <!--<button
+        <!--<button
           class="btn variant-filled-secondary mr-2"
           on:click={() =>
             removePerformanceLevel($rubric.performance_levels.length - 1)}
@@ -523,7 +582,7 @@
       <label
         class="input dark:bg-dark-surface border-none flex items-center gap-2 w-[20%]"
       >
-        {$t('model_name')}:
+        {$t("model_name")}:
         <input
           id="model_name"
           type="text"
@@ -546,7 +605,9 @@
               class="drag-drop-row-cell border border-tertiary-500 border-solid"
             ></th>
             <!-- PERFORMANCE LEVELS -->
-            <th class="border border-tertiary-500 border-solid">{$t('criterion')}</th>
+            <th class="border border-tertiary-500 border-solid"
+              >{$t("criterion")}</th
+            >
             {#each $rubric.performance_levels as level, colIndex}
               <th
                 class="border border-tertiary-500 border-solid p-4"
@@ -558,18 +619,22 @@
                 on:dragover|preventDefault={onDragOverColumn}
                 on:drop={onDropColumn}
               >
-                <div class="flex flex-row flex-nowrap justify-between items-center cursor-grab w-full h-4 mb-2">
-                    <span id="grab_drop_btn_column" class="text-xl font-semibold text-center text-black dark:text-white cursor-grab">≡</span>
-                    <div
+                <div
+                  class="flex flex-row flex-nowrap justify-between items-center cursor-grab w-full h-4 mb-2"
+                >
+                  <span
+                    id="grab_drop_btn_column"
+                    class="text-xl font-semibold text-center text-black dark:text-white cursor-grab"
+                    >≡</span
+                  >
+                  <div
                     id="delete_column_btn"
                     class="hover:text-error-500 w-5"
                     role="button"
                     tabindex="0"
-                    on:click={() =>
-                      openDeleteColumnModal(colIndex)}
+                    on:click={() => openDeleteColumnModal(colIndex)}
                     on:keydown={(e) =>
-                      e.key === "Enter" &&
-                      openDeleteColumnModal(colIndex)}
+                      e.key === "Enter" && openDeleteColumnModal(colIndex)}
                     aria-label="Remover Linha"
                   >
                     <IoMdTrash />
@@ -584,7 +649,7 @@
                     e.key === "Enter" &&
                     handleFieldChange(
                       `performance_levels.${$rubric.performance_levels.indexOf(level)}.name`,
-                      e.target?.value,
+                      e.target?.value
                     )}
                 />
                 <br />
@@ -598,9 +663,10 @@
                     e.key === "Enter" &&
                     handleFieldChange(
                       `performance_levels.${$rubric.performance_levels.indexOf(level)}.value`,
-                      e.target?.value,
+                      e.target?.value
                     )}
-                /> {$t('points')}
+                />
+                {$t("points")}
               </th>
             {/each}
           </tr>
@@ -650,7 +716,7 @@
                     e.key === "Enter" &&
                     handleFieldChange(
                       `criteria.${cIndex}.name`,
-                      e.target?.value,
+                      e.target?.value
                     )}
                 />
               </td>
@@ -681,50 +747,92 @@
     <div class="w-max-[100vw] flex justify-between items-center">
       <div class="flex justify-start" id="rubric_tags_label">
         <div class="w-max m-2">
-          {$t('majors')}:
+          {$t("majors")}:
           <TagAutoComplete {docId} field={"major"} />
         </div>
         <div class="w-max m-2">
-          {$t('courses')}:
+          {$t("courses")}:
           <TagAutoComplete {docId} field={"course"} />
         </div>
-      </div> 
+      </div>
       <div class="flex justify-center items-center m-2 ml-5">
-        <button id="save_model_rubric_btn" class="btn variant-filled-primary font-bold dark:text-white ml-2" on:click={saveAll}
-        >{$t("edit_rubric_save_btn")}</button>
-      </div> 
+        <button
+          id="save_model_rubric_btn"
+          class="btn variant-filled-primary font-bold dark:text-white ml-2"
+          on:click={openEditWarningModal}>{$t("edit_rubric_save_btn")}</button
+        >
+        <button
+          on:click={openPublishModal}
+          class="btn bg-primary-500 text-white hover:bg-primary-600"
+        >
+          {$t("publish_rubric_btn")}
+        </button>
+      </div>
     </div>
     <!-- Modal para editar descritores -->
     <dialog id="edit_modal" class="modal">
       <div class="modal-box bg-secondary-500 dark:bg-dark-surface p-2">
-        <h3 class="text-lg font-bold mb-2">{$t('edit_rubric_descriptor_modal_title')}</h3>
+        <h3 class="text-lg font-bold mb-2">
+          {$t("edit_rubric_descriptor_modal_title")}
+        </h3>
         <textarea
           id="descriptor_textarea"
           class="textarea textarea-bordered w-full h-32 bg-surface-200 dark:bg-dark-secondary border-none"
-          placeholder={$t('edit_rubric_descriptor_modal_placeholder')}
+          placeholder={$t("edit_rubric_descriptor_modal_placeholder")}
         ></textarea>
         <div class="modal-action">
           <button on:click={saveDescriptor} class="btn bg-primary-500"
-            >{$t('edit_rubric_descriptor_modal_save_btn')}</button
+            >{$t("edit_rubric_descriptor_modal_save_btn")}</button
           >
           <form method="dialog">
             <!-- if there is a button in form, it will close the modal -->
             <button class="btn bg-secondary-500 dark:bg-dark-secondary"
-              >{$t('modal_cancel_btn')}</button
+              >{$t("modal_cancel_btn")}</button
             >
           </form>
         </div>
       </div>
     </dialog>
 
-    <Modal modalId={"row_confirm_modal"} modalFunction={confirmRemoveRow} modalTitle={$t('modal_delete_title')} modalMessage={$t('modal_row_delete_message')} modalButton={$t('modal_confirm_button')} />
+    <Modal
+      modalId={"row_confirm_modal"}
+      modalFunction={confirmRemoveRow}
+      modalTitle={$t("modal_delete_title")}
+      modalMessage={$t("modal_row_delete_message")}
+      modalButton={$t("modal_confirm_button")}
+    />
 
-    <Modal modalId={"col_confirm_modal"} modalFunction={confirmRemoveColumn} modalTitle={$t('modal_delete_title')} modalMessage={$t('modal_column_delete_message')} modalButton={$t('modal_confirm_button')}  />
+    <Modal
+      modalId={"col_confirm_modal"}
+      modalFunction={confirmRemoveColumn}
+      modalTitle={$t("modal_delete_title")}
+      modalMessage={$t("modal_column_delete_message")}
+      modalButton={$t("modal_confirm_button")}
+    />
 
-    <Modal modalId={"reset_modal"} modalFunction={resetGrid} modalTitle={$t('modal_clean_title')} modalMessage={$t('modal_clean_message')} modalButton={$t('modal_confirm_button')} />
+    <Modal
+      modalId={"reset_modal"}
+      modalFunction={resetGrid}
+      modalTitle={$t("modal_clean_title")}
+      modalMessage={$t("modal_clean_message")}
+      modalButton={$t("modal_confirm_button")}
+    />
+
+    <!-- Modal de confirmação para publicar a rubrica -->
+    <Modal
+      modalId="publish_modal"
+      modalFunction={publishRubric}
+      modalTitle={$t("modal_publish_title")}
+      modalMessage={$t("modal_publish_message")}
+      modalButton={$t("modal_confirm_button")}
+    />
+
+    
+<!-- Modal de aviso de edição -->
+<Modal modalId="edit_warning_modal" modalFunction={saveAll} modalTitle={$t('edit_rubric_warning_title')} modalMessage={$t('edit_rubric_warning_message')} modalButton={$t('modal_confirm_button')} />
   </div>
 {:else}
-  <p>{$t('loading_rubric')}</p>
+  <p>{$t("loading_rubric")}</p>
 {/if}
 
 <style>
