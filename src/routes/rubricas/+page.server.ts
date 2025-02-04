@@ -10,11 +10,24 @@ export const load: PageServerLoad = async ({ locals }) => {
     }
 
     try {
-        // Carrega os modelos de rubricas do usuário
-        const rubricasSnapshot = await adminDB.collection('rubrics').where('uid', '==', uid).get();
+        // Carrega todas as rubricas do usuário
+        const rubricasSnapshot = await adminDB.collection('rubrics')
+            .where('uid', '==', uid)
+            .where('public', '==', true)
+            .where('finished', '==', true)
+            .orderBy('version', 'desc')
+            .get();
+
         const rubricasData = rubricasSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+        // Carrega as rubricas públicas
+        const editingRubricasSnapshot = await adminDB.collection('rubrics').where('public', '==', false).where('finished', '==', false).get();
+        const editingRubricasData = editingRubricasSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+
         return {
-            rubricas: rubricasData
+            rubricas: rubricasData,
+            editingRubricas: editingRubricasData
         };
     } catch (err) {
         console.error('Erro ao carregar rubricas:', err);
