@@ -6,7 +6,7 @@
   import Drawer from "$lib/components/Drawer.svelte";
   import Modal from "$lib/components/Modal.svelte";
   import { goto } from "$app/navigation";
-  import { doc, deleteDoc } from "firebase/firestore";
+  import { doc, deleteDoc, addDoc, collection, getDoc, updateDoc } from "firebase/firestore";
   import { db } from "$lib/firebase"; // Ajuste o caminho conforme sua configuração
   import { t } from "svelte-i18n";
   import Shepherd from "shepherd.js";
@@ -51,9 +51,47 @@
     }
   }
 
+  
+  async function copyRubric(rubricId: string) {
+    const docRef = doc(db, "rubrics", rubricId);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+
+      // Verifica se a rubrica já está no modo de edição
+      if (!data.finished) {
+        // Redireciona para a página de edição da rubrica atual
+        goto(`/rubricas/${rubricId}/editar modelo`);
+        return;
+      }
+
+      await updateDoc(docRef, { public: false });
+
+      const newVersion = data.version + 1;
+
+      // Cria uma nova rubrica com a nova versão
+      const newRubric = {
+        ...data,
+        version: newVersion,
+        finished: false,
+        original_model: rubricId,
+      };
+
+      // Adiciona a nova rubrica ao Firestore
+      const newDocRef = await addDoc(collection(db, "rubrics"), newRubric);
+      const newDocId = newDocRef.id;
+
+      // Redireciona para a página de edição da nova rubrica
+      goto(`/rubricas/${newDocId}/editar modelo`);
+    } else {
+      console.error("Rubrica não encontrada!");
+    }
+  }
+
   // Função para redirecionar para a página de edição
   function editarRubrica(id: string) {
-    goto(`/rubricas/${id}/editar modelo`);
+    copyRubric(id);
   }
 
   // Função para criar um novo modelo de rubrica
@@ -414,6 +452,7 @@
     modalMessage={$t("modal_delete_message")}
     modalButton={$t("modal_delete_btn")}
   />
+
 </main>
 
 <style>

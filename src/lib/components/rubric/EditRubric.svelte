@@ -480,7 +480,7 @@
             major: currentRubric.major,
             criteria: currentRubric.criteria,
             performance_levels: currentRubric.performance_levels,
-            public: false, // Não está pública enquanto em edição
+            public: currentRubric.public, // Não está pública enquanto em edição
             version: currentRubric.version,
             original_model: currentRubric.original_model,
             finished: false, // Não está finalizada enquanto em edição
@@ -505,24 +505,17 @@
 
     if (docSnap.exists()) {
       const data = docSnap.data();
-      const newVersion = data.version + 1;
 
-      // Cria uma nova rubrica com a nova versão
-      const newRubric = {
-        ...data,
-        version: newVersion,
-        public: true,
-        finished: true,
-        original_model: docId,
-      };
-
-      await addDoc(collection(db, "rubrics"), newRubric);
-
-      // Atualiza a rubrica atual para não ser mais utilizada
-      await updateDoc(docRef, { public: true, finished: false });
+      // Atualiza o estado de finished e public para false na versão anterior
+      if (data.original_model) {
+        const originalDocRef = doc(db, "rubrics", data.original_model);
+        await updateDoc(originalDocRef, { finished: false, public: false });
+      }
+      // Atualiza o estado de finished para true
+      await updateDoc(docRef, { public: true,finished: true });
 
       console.log("Rubrica publicada com sucesso!");
-          // Fecha o modal de publicação
+      // Fecha o modal de publicação
       // @ts-ignore
       document.getElementById("publish_modal")?.close();
     } else {

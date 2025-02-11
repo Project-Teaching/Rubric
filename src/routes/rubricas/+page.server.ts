@@ -21,7 +21,7 @@ export const load: PageServerLoad = async ({ locals }) => {
         const rubricasData = rubricasSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
         // Carrega as rubricas públicas
-        const editingRubricasSnapshot = await adminDB.collection('rubrics').where('public', '==', false).where('finished', '==', false).get();
+        const editingRubricasSnapshot = await adminDB.collection('rubrics').where('public', '==', true).where('finished', '==', false).get();
         const editingRubricasData = editingRubricasSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
 
