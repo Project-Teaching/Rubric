@@ -16,6 +16,7 @@
   import { t } from 'svelte-i18n';
   import { enhance } from '$app/forms';
   import GroupCardEvaluation from '$lib/components/majors/GroupCardEvaluation.svelte';
+  import EGModalRubric from '$lib/components/rubric/EGModalRubric.svelte';
 
   let classes: { 
         course_id: string, course_semester: number, course_year: number, professors: any[], students: any[]
@@ -59,6 +60,25 @@
     reloadPage();
   }
 
+  function openEGModalRubric(group_id: string, student_ids: string[], group_name: string) {
+    currentGroup = { group_id, student_ids, group_name };
+    const modal = document.getElementById('EGrubricModal');
+    if (modal) {
+      // @ts-ignore
+      modal.showModal();
+    }
+  }
+  
+  function closeEGModalRubric() {
+    currentGroup = null;
+    const modal = document.getElementById('EGrubricModal');
+    if (modal) {
+      // @ts-ignore
+      modal.close();
+    }
+    reloadPage();
+  }
+
   function reloadPage() {
     window.location.reload();
   }
@@ -69,6 +89,12 @@
       return 'Avaliado';
     }
     return 'Não avaliado';
+  }
+
+  function isGroupEvaluated(group: { student_ids: string[] }) {
+    return group.student_ids.some(studentId => 
+      evaluation.evaluation_result.some(result => result.student_id === studentId)
+    );
   }
 
   $: {
@@ -109,15 +135,26 @@
                 <!-- Responsive Container (recommended) -->
                 <div class="flex flex-wrap justify-start gap-3">
                   {#each groups as group (group.id)}
-                    <div class="p-4 rounded-lg shadow-md min-h-60 max-h-72 overflow-y-auto overflow-x-auto w-[26vw] bg-secondary-600 dark:bg-dark-secondary m-2">
-                        <div class="flex justify-between">
-                          <h3 class="text-md w-24 mt-2 mb-2 font-bold">{group.group_id}</h3>
-                          <button on:click={() => openModalRubric(group.id, group.student_ids, group.group_id)} class="w-5 h-5 text-primary-500 hover:text-primary-300 mr-3">
-                            <FaRegListAlt/>
-                          </button>
-                        </div>
-                      <GroupCardEvaluation group_id={group.group_id} gid_ref={group.id} student_ids={group.student_ids} class_id={class_id} />
+                    <div class="p-4 rounded-lg shadow-md min-h-60 max-h-72 overflow-y-auto overflow-x-auto w-[26vw] bg-secondary-600 dark:bg-dark-secondary
+                    {isGroupEvaluated(group) ? 'border-4 border-green-700' : 'border-4 border-secondary-600 dark:border-dark-secondary'} m-2">
+                    <div class="flex justify-between">
+                      <h3 class="text-md w-24 mt-2 mb-2 font-bold">{group.group_id}</h3>
+                      {#if isGroupEvaluated(group)}
+                        <button 
+                          on:click={() => openEGModalRubric(group.id, group.student_ids, group.group_id)} 
+                          class="w-5 h-5 text-green-600 hover:text-gray-300 mr-3">
+                          <FaEye/>  <!-- Ícone de olho para indicar visualização da avaliação -->
+                        </button>
+                      {:else}
+                        <button 
+                          on:click={() => openModalRubric(group.id, group.student_ids, group.group_id)} 
+                          class="w-5 h-5 text-primary-500 hover:text-primary-300 mr-3">
+                          <FaRegListAlt/>  <!-- Ícone de lista para iniciar a avaliação -->
+                        </button>
+                      {/if}
                     </div>
+                    <GroupCardEvaluation group_id={group.group_id} gid_ref={group.id} student_ids={group.student_ids} class_id={class_id} />
+                  </div>
                   {/each}
                 </div>
               </section>
@@ -138,7 +175,31 @@
               <GroupModalRubric docId={rubricModel.id}  groupId={currentGroup?.group_id}  professorId={professorId} evaluationId={evaluation.id} student_ids={currentGroup?.student_ids}></GroupModalRubric>
             </div>
           </div>
-        </dialog>     
+        </dialog>  
+        
+         <!-- Modal de Avaliação -->
+         <dialog id="EGrubricModal" class="modal">
+          <div class="w-[85%] bg-surface-400 dark:bg-dark-surface p-6 m-2 flex flex-col items-center justify-center relative">
+          <div class="flex items-center justify-between">
+            <!-- Botão Cancelar -->
+            <form method="dialog">
+              <button on:click={closeEGModalRubric} class="absolute top-4 right-4 rounded-full w-8 h-8 flex items-center justify-center bg-primary-500 text-white dark:bg-red-800">X</button>
+            </form>
+            <!-- Título centralizado -->
+            <h3 class="text-lg font-bold ml-5 mb-4 text-center">{$t('group_evaluation')}: {currentGroup?.group_name}</h3>
+          </div>
+            <!-- Matriz ou conteúdo do modal -->
+            <div class="w-full overflow-x-auto">
+              <EGModalRubric 
+              docId={rubricModel.id}  
+              groupId={currentGroup?.group_id}  
+              professorId={professorId} 
+              evaluationId={evaluation.id} 
+              student_ids={currentGroup?.student_ids}>
+            </EGModalRubric>
+            </div>
+          </div>
+        </dialog>   
         <Drawer></Drawer>
       </div>
     </div>
