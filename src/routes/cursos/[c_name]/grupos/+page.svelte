@@ -10,6 +10,8 @@
   //@ts-ignore
   import IoMdPersonAdd from 'svelte-icons/io/IoMdPersonAdd.svelte'
   import { enhance } from '$app/forms';
+  import UngroupedStudentCard from '$lib/components/majors/UngroupedStudentCard.svelte';
+  
   let classes: { 
         course_id: string, course_semester: number, course_year: number, professors: any[], students: any[]
       };
@@ -72,6 +74,7 @@
               {#each groups as group (group.id)}
                 <GroupCard group_id={group.group_id} gid_ref={group.id} student_ids={group.student_ids} class_id={class_id} />
               {/each}
+                <UngroupedStudentCard class_id={class_id} groups={groups} />
             </div>
           </section>
         </div>
