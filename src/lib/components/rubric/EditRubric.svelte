@@ -17,6 +17,7 @@
   import IoMdRefreshCircle from "svelte-icons/io/IoMdRefreshCircle.svelte";
   import Modal from "../Modal.svelte";
   import { t } from "svelte-i18n";
+  import { SlideToggle } from "@skeletonlabs/skeleton";
 
   interface Criterion {
     name: string;
@@ -596,7 +597,7 @@
     <div class="flex justify-between" id="rubric_model_name_label">
       
       <label
-        class="input dark:bg-dark-surface border-none flex items-center gap-2 w-[30%]"
+        class="input dark:bg-dark-surface border-none flex items-center gap-2 w-[40%]"
       >
         {$t("model_name")}:
         <input
@@ -609,22 +610,26 @@
             handleFieldChange("model_name", e.target?.value)}
         />
         <span class="tag bg-secondary-00 text-white p-2 rounded">
-          Versão: {$rubric.version}
+          {$t("version")} {$rubric.version}
         </span>
       </label>
       
-    <div class="flex items-center">
-        <button
-          on:click={togglePublic}
-          class="btn bg-primary-500 text-white hover:bg-primary-600 mr-4"
-        >
+      <div class="flex items-center">
+        <SlideToggle
+          name="public-private-toggle"
+          background="bg-secondary-700 dark:bg-secondary-900"
+          active="bg-primary-500"
+          size="md"
+          bind:checked={$rubric.public}
+          on:change={togglePublic}
+        ></SlideToggle>
+        <span class="ml-2">
           {#if $rubric.public}
-            Tornar Privada
+            {$t("public")}
           {:else}
-            Tornar Pública
+            {$t("private")}
           {/if}
-        </button>
-        
+        </span>
       </div>
     </div>
     <!-- MATRIZ DA RUBRICA -->
@@ -688,7 +693,7 @@
                 <br />
                 <input
                   id="performance_level_value_input"
-                  class="grow bg-surface-500 dark:bg-dark-surface text-lg rounded-md max-h-7 text-center max-w-16 mt-1"
+                  class="grow bg-surface-500 dark:bg-dark-surface text-lg rounded-md max-h-7 text-center max-w-24 mt-1"
                   type="number"
                   min="0"
                   value={level.value}
