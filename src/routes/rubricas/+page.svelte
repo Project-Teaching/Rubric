@@ -5,6 +5,7 @@
   import Breadcrumbs from "$lib/components/Breadcrumbs.svelte";
   import Drawer from "$lib/components/Drawer.svelte";
   import Modal from "$lib/components/Modal.svelte";
+  import ViewRubricModal from "$lib/components/rubric/ViewRubricModal.svelte";
   import { goto } from "$app/navigation";
   import { doc, deleteDoc, addDoc, collection, getDoc, updateDoc } from "firebase/firestore";
   import { db } from "$lib/firebase"; // Ajuste o caminho conforme sua configuração
@@ -26,6 +27,7 @@
     public: boolean;
     original_model: string;
     finished: boolean;
+    in_edit: boolean;
   }[];
 
   let editingRubricas: {
@@ -40,9 +42,12 @@
     public: boolean;
     original_model: string;
     finished: boolean;
+    in_edit: boolean;
   }[];
 
   let rubricaParaRemover: string | null = null;
+  let showModal = false;
+  let rubricaVisualizarId: string | null = null;
 
   $: {
     if ($page.data) {
@@ -52,7 +57,7 @@
   }
 
   
-  async function copyRubric(rubricId: string) {
+  async function editRubric(rubricId: string) {
     const docRef = doc(db, "rubrics", rubricId);
     const docSnap = await getDoc(docRef);
 
@@ -60,13 +65,13 @@
       const data = docSnap.data();
 
       // Verifica se a rubrica já está no modo de edição
-      if (!data.finished) {
+      if (data.in_edit && !data.finished) {
         // Redireciona para a página de edição da rubrica atual
         goto(`/rubricas/${rubricId}/editar modelo`);
         return;
       }
 
-      await updateDoc(docRef, { public: false });
+      await updateDoc(docRef, { in_edit: false, finished: false });
 
       const newVersion = data.version + 1;
 
@@ -75,6 +80,7 @@
         ...data,
         version: newVersion,
         finished: false,
+        in_edit: true,
         original_model: rubricId,
       };
 
@@ -89,10 +95,6 @@
     }
   }
 
-  // Função para redirecionar para a página de edição
-  function editarRubrica(id: string) {
-    copyRubric(id);
-  }
 
   // Função para criar um novo modelo de rubrica
   function criarNovaRubrica() {
@@ -139,6 +141,14 @@
         rubricaParaRemover = null;
       }
     }
+  }
+
+    // Função para visualizar uma rubrica pública
+  async function viewRubric(RubricId: string) {
+    rubricaVisualizarId = RubricId;
+    showModal = true;
+    // @ts-ignore
+    document.getElementById("view_rubric_modal").showModal();
   }
 
   const startTour = async () => {
@@ -274,6 +284,11 @@
   <title>Rubric Pro</title>
 </svelte:head>
 
+<!-- Modal de visualização da rubrica -->
+{#if showModal && rubricaVisualizarId}
+  <ViewRubricModal docId={rubricaVisualizarId} onEdit={() => editRubric(rubricaVisualizarId)} />
+{/if}
+
 <main class="flex flex-col min-h-screen dark:bg-dark-surface">
   <NavBar></NavBar>
   <Breadcrumbs />
@@ -331,12 +346,9 @@
                       >
                         <span class="text-xl font-bold">x</span>
                       </button>
-                      <button
-                        id="r_edit_btn"
-                        on:click={() => editarRubrica(rubrica.id)}
-                        class="btn variant-filled-primary text-white dark:text-white w-12 h-12 rounded-full flex items-center justify-center"
-                      >
-                        <span class="text-2xl font-bold">+</span>
+                      <button on:click={() => viewRubric(rubrica.id)} class="bg-primary-500 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg"
+                        >
+                          <span class="text-2xl font-bold">+</span>
                       </button>
                     </div>
                   </div>
@@ -400,12 +412,9 @@
                       >
                         <span class="text-xl font-bold">x</span>
                       </button>
-                      <button
-                        id="r_edit_btn"
-                        on:click={() => editarRubrica(rubrica.id)}
-                        class="btn variant-filled-primary text-white dark:text-white w-12 h-12 rounded-full flex items-center justify-center"
-                      >
-                        <span class="text-2xl font-bold">+</span>
+                      <button on:click={() => viewRubric(rubrica.id)} class="bg-primary-500 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg"
+                        >
+                          <span class="text-2xl font-bold">+</span>
                       </button>
                     </div>
                   </div>

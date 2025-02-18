@@ -29,6 +29,7 @@ export const load = async ({ locals }) => {
         ],
         public: true,
         finished: false,
+        in_edit: true,
         version: 0,
         original_model: ''
     };

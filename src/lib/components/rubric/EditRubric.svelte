@@ -37,6 +37,7 @@
     version: number;
     original_model: string;
     finished: boolean;
+    in_edit: boolean;
   }
   export let docId: string;
   let rubric = writable<Rubric | null>(null);
@@ -480,10 +481,11 @@
             major: currentRubric.major,
             criteria: currentRubric.criteria,
             performance_levels: currentRubric.performance_levels,
-            public: currentRubric.public, // Não está pública enquanto em edição
+            public: currentRubric.public,
             version: currentRubric.version,
             original_model: currentRubric.original_model,
             finished: false, // Não está finalizada enquanto em edição
+            in_edit: true, // Indica que está em edição
           };
 
           // Atualiza o documento no Firestore com os novos dados
@@ -506,18 +508,38 @@
     if (docSnap.exists()) {
       const data = docSnap.data();
 
-      // Atualiza o estado de finished e public para false na versão anterior
+      // Atualiza o estado de finished e edição para false na versão anterior
       if (data.original_model) {
         const originalDocRef = doc(db, "rubrics", data.original_model);
-        await updateDoc(originalDocRef, { finished: false, public: false });
+        await updateDoc(originalDocRef, { finished: false, in_edit: false });
       }
       // Atualiza o estado de finished para true
-      await updateDoc(docRef, { public: true,finished: true });
+      await updateDoc(docRef, { finished: true, in_edit: false });
 
       console.log("Rubrica publicada com sucesso!");
       // Fecha o modal de publicação
       // @ts-ignore
       document.getElementById("publish_modal")?.close();
+    } else {
+      console.error("Documento não encontrado!");
+    }
+  }
+
+  async function togglePublic() {
+    const docRef = doc(db, "rubrics", docId);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      const newPublicState = !data.public;
+
+      await updateDoc(docRef, { public: newPublicState });
+      rubric.update(r => {
+        if (r) {
+          return { ...r, public: newPublicState };
+        }
+        return r;
+      });
     } else {
       console.error("Documento não encontrado!");
     }
@@ -571,9 +593,10 @@
       </div>
     </div>
     <!-- INFORMAÇÕES DA RUBRICA -->
-    <div class="flex justify-start" id="rubric_model_name_label">
+    <div class="flex justify-between" id="rubric_model_name_label">
+      
       <label
-        class="input dark:bg-dark-surface border-none flex items-center gap-2 w-[20%]"
+        class="input dark:bg-dark-surface border-none flex items-center gap-2 w-[30%]"
       >
         {$t("model_name")}:
         <input
@@ -585,7 +608,24 @@
             e.key === "Enter" &&
             handleFieldChange("model_name", e.target?.value)}
         />
+        <span class="tag bg-secondary-00 text-white p-2 rounded">
+          Versão: {$rubric.version}
+        </span>
       </label>
+      
+    <div class="flex items-center">
+        <button
+          on:click={togglePublic}
+          class="btn bg-primary-500 text-white hover:bg-primary-600 mr-4"
+        >
+          {#if $rubric.public}
+            Tornar Privada
+          {:else}
+            Tornar Pública
+          {/if}
+        </button>
+        
+      </div>
     </div>
     <!-- MATRIZ DA RUBRICA -->
     <div class="max-w-[100vw] max-h-[68vh] overflow-x-auto overflow-y-auto">
@@ -748,7 +788,7 @@
           <TagAutoComplete {docId} field={"course"} />
         </div>
       </div>
-      <div class="flex justify-center items-center m-2 ml-5">
+      <div class="flex justify-between items-center m-2 ml-5 w-[25%]">
         <button
           id="save_model_rubric_btn"
           class="btn variant-filled-primary font-bold dark:text-white ml-2"
