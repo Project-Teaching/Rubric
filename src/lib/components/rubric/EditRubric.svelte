@@ -555,72 +555,73 @@
 
   
   function validateRubric() {
-  let isValid = true;
-  let errorMessages: string[] = [];
+    let isValid = true;
+    let errorMessages: string[] = [];
 
-  rubric.update(r => {
-    if (r) {
-      // Verifica se o nome do modelo está preenchido
-      if (!r.model_name.trim().length) {
-        isValid = false;
-        errorMessages.push("O nome do modelo não pode estar vazio.");
-        highlightError("model_name");
-      }
-
-      // Verifica se todos os critérios e descritores estão preenchidos
-      r.criteria.forEach((criterion, cIndex) => {
-        if (!criterion.name.trim()) {
+    rubric.update(r => {
+      if (r) {
+        // Verifica se o nome do modelo está preenchido
+        if (!r.model_name.trim()) {
           isValid = false;
-          errorMessages.push(`O nome do critério ${cIndex + 1} não pode estar vazio.`);
-          highlightError(`criterion_input_${cIndex}`);
+          errorMessages.push($t("validation.model_name_empty"));
+          highlightError("model_name");
         }
-        criterion.descriptors.forEach((descriptor, dIndex) => {
-          if (!descriptor.trim()) {
+
+        // Verifica se todos os critérios e descritores estão preenchidos
+        r.criteria.forEach((criterion, cIndex) => {
+          if (!criterion.name.trim()) {
             isValid = false;
-            errorMessages.push(`O descritor ${dIndex + 1} do critério ${cIndex + 1} não pode estar vazio.`);
-            highlightError(`descriptor_cell_${cIndex}_${dIndex}`);
+            errorMessages.push($t("validation.criterion_name_empty_1") + (cIndex + 1) + $t("validation.criterion_name_empty_2"));
+            highlightError(`criterion_input_${cIndex}`);
           }
+          criterion.descriptors.forEach((descriptor, dIndex) => {
+            if (!descriptor.trim() || descriptor.trim().length < 3) {
+              isValid = false;
+              errorMessages.push($t("validation.descriptor_empty_1") + (cIndex + 1) + $t("validation.descriptor_empty_2") + (dIndex + 1) + $t("validation.descriptor_empty_3"));
+              highlightError(`descriptor_cell_${cIndex}_${dIndex}`);
+            }
+          });
         });
-      });
 
-      // Verifica se os níveis de performance estão preenchidos e em ordem crescente
-      let previousValue = -Infinity;
-      r.performance_levels.forEach((level, lIndex) => {
-        if (!level.name.trim()) {
-          isValid = false;
-          errorMessages.push(`O nome do nível de performance ${lIndex + 1} não pode estar vazio.`);
-          highlightError(`performance_level_input_${lIndex}`);
-        }
-        if (level.value <= 0) {
-          isValid = false;
-          errorMessages.push(`O valor do nível de performance ${lIndex + 1} deve ser maior que zero.`);
-          highlightError(`performance_level_value_input_${lIndex}`);
-        }
-        if (level.value <= previousValue) {
-          isValid = false;
-          errorMessages.push(`O valor do nível de performance ${lIndex + 1} deve ser maior que o valor do nível anterior.`);
-          highlightError(`performance_level_value_input_${lIndex}`);
-        }
-        previousValue = level.value;
-      });
-    }
-    return r;
-  });
-
-  validationError.set(errorMessages.join("\n"));
-
-  if (!isValid) {
-    toastStore.trigger({
-      message: errorMessages.join("<br>"),
-      background: 'variant-filled-error dark:bg-error-800',
-      timeout: 15000
+        // Verifica se os níveis de performance estão preenchidos e em ordem crescente
+        let previousValue = -Infinity;
+        r.performance_levels.forEach((level, lIndex) => {
+          if (!level.name.trim()) {
+            isValid = false;
+            errorMessages.push($t("validation.performance_level_name_empty_1") + (lIndex + 1) + $t("validation.performance_level_name_empty_2"));
+            highlightError(`performance_level_input_${lIndex}`);
+          }
+          if (level.value < 0) {
+            isValid = false;
+            errorMessages.push($t("validation.performance_level_value_invalid_1") + (lIndex + 1) + $t("validation.performance_level_value_invalid_2"));
+            highlightError(`performance_level_value_input_${lIndex}`);
+          }
+          if (level.value <= previousValue) {
+            isValid = false;
+            errorMessages.push($t("validation.performance_level_value_order_1") + (lIndex + 1) + $t("validation.performance_level_value_order_2"));
+            highlightError(`performance_level_value_input_${lIndex}`);
+          }
+          previousValue = level.value;
+        });
+      }
+      return r;
     });
-    // Fecha o modal de publicação se houver erro de validação
-    document.getElementById("publish_modal")?.close();
+
+    validationError.set(errorMessages.join("\n"));
+
+    if (!isValid) {
+      toastStore.trigger({
+        message: errorMessages.join("<br>"),
+        background: 'variant-filled-error dark:bg-error-800',
+        timeout: 15000
+      });
+      // Fecha o modal de publicação se houver erro de validação
+      document.getElementById("publish_modal")?.close();
+    }
+
+    return isValid;
   }
 
-  return isValid;
-}
 
   function highlightError(elementId: string) {
     const element = document.getElementById(elementId);
