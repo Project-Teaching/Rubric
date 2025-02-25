@@ -18,6 +18,7 @@
   import Modal from "../Modal.svelte";
   import { t } from "svelte-i18n";
   import { SlideToggle } from "@skeletonlabs/skeleton";
+  import { Toast, getToastStore } from "@skeletonlabs/skeleton";
 
   interface Criterion {
     name: string;
@@ -42,11 +43,13 @@
   }
   export let docId: string;
   let rubric = writable<Rubric | null>(null);
+    let validationError = writable<string | null>(null);
   let descriptorIndex: number | null = null;
   let criterionIndex: number | null = null;
   let isOver: number | null = null;
   let linhaRemover: number | null = null; // Variável global para armazenar a linha a ser removida
   let colunaRemover: number | null = null; // Variável global para armazenar a linha a ser removida
+  const toastStore = getToastStore();
 
   // Função para abrir o modal de edição de descritor
   function openEditModal(cIndex: number, dIndex: number) {
@@ -503,6 +506,10 @@
   }
 
   async function publishRubric() {
+    if (!validateRubric()) {
+      return;
+    }
+    
     const docRef = doc(db, "rubrics", docId);
     const docSnap = await getDoc(docRef);
 
@@ -545,6 +552,88 @@
       console.error("Documento não encontrado!");
     }
   }
+
+  
+  function validateRubric() {
+  let isValid = true;
+  let errorMessages: string[] = [];
+
+  rubric.update(r => {
+    if (r) {
+      // Verifica se o nome do modelo está preenchido
+      if (!r.model_name.trim().length) {
+        isValid = false;
+        errorMessages.push("O nome do modelo não pode estar vazio.");
+        highlightError("model_name");
+      }
+
+      // Verifica se todos os critérios e descritores estão preenchidos
+      r.criteria.forEach((criterion, cIndex) => {
+        if (!criterion.name.trim()) {
+          isValid = false;
+          errorMessages.push(`O nome do critério ${cIndex + 1} não pode estar vazio.`);
+          highlightError(`criterion_input_${cIndex}`);
+        }
+        criterion.descriptors.forEach((descriptor, dIndex) => {
+          if (!descriptor.trim()) {
+            isValid = false;
+            errorMessages.push(`O descritor ${dIndex + 1} do critério ${cIndex + 1} não pode estar vazio.`);
+            highlightError(`descriptor_cell_${cIndex}_${dIndex}`);
+          }
+        });
+      });
+
+      // Verifica se os níveis de performance estão preenchidos e em ordem crescente
+      let previousValue = -Infinity;
+      r.performance_levels.forEach((level, lIndex) => {
+        if (!level.name.trim()) {
+          isValid = false;
+          errorMessages.push(`O nome do nível de performance ${lIndex + 1} não pode estar vazio.`);
+          highlightError(`performance_level_input_${lIndex}`);
+        }
+        if (level.value <= 0) {
+          isValid = false;
+          errorMessages.push(`O valor do nível de performance ${lIndex + 1} deve ser maior que zero.`);
+          highlightError(`performance_level_value_input_${lIndex}`);
+        }
+        if (level.value <= previousValue) {
+          isValid = false;
+          errorMessages.push(`O valor do nível de performance ${lIndex + 1} deve ser maior que o valor do nível anterior.`);
+          highlightError(`performance_level_value_input_${lIndex}`);
+        }
+        previousValue = level.value;
+      });
+    }
+    return r;
+  });
+
+  validationError.set(errorMessages.join("\n"));
+
+  if (!isValid) {
+    toastStore.trigger({
+      message: errorMessages.join("<br>"),
+      background: 'variant-filled-error dark:bg-error-800',
+      timeout: 15000
+    });
+    // Fecha o modal de publicação se houver erro de validação
+    document.getElementById("publish_modal")?.close();
+  }
+
+  return isValid;
+}
+
+  function highlightError(elementId: string) {
+    const element = document.getElementById(elementId);
+    console.log(element);
+
+    if (element) {
+      element.classList.add("error_selected");
+      setTimeout(() => {
+        element.classList.remove("error_selected");
+      }, 10000);
+    }
+  }
+
 
   onMount(() => {
     fetchRubric(docId);
@@ -632,155 +721,155 @@
         </span>
       </div>
     </div>
-    <!-- MATRIZ DA RUBRICA -->
-    <div class="max-w-[100vw] max-h-[68vh] overflow-x-auto overflow-y-auto">
-      <table class="table-fixed border-collapse mt-5">
-        <thead
-          class="table-header-group bg-secondary-500 dark:bg-dark-secondary text-md"
-        >
-          <tr>
-            <th
-              class="drag-drop-row-cell border border-tertiary-500 border-solid"
-            ></th>
-            <!-- PERFORMANCE LEVELS -->
-            <th class="border border-tertiary-500 border-solid"
-              >{$t("criterion")}</th
-            >
-            {#each $rubric.performance_levels as level, colIndex}
-              <th
-                class="border border-tertiary-500 border-solid p-4"
-                class:over={colIndex === isOver}
-                data-index={colIndex}
-                data-id={colIndex}
-                draggable="true"
-                on:dragstart={onDragStartColumn}
-                on:dragover|preventDefault={onDragOverColumn}
-                on:drop={onDropColumn}
-              >
-                <div
-                  class="flex flex-row flex-nowrap justify-between items-center cursor-grab w-full h-4 mb-2"
-                >
-                  <span
-                    id="grab_drop_btn_column"
-                    class="text-xl font-semibold text-center text-black dark:text-white cursor-grab"
-                    >≡</span
-                  >
-                  <div
-                    id="delete_column_btn"
-                    class="hover:text-error-500 w-5"
-                    role="button"
-                    tabindex="0"
-                    on:click={() => openDeleteColumnModal(colIndex)}
-                    on:keydown={(e) =>
-                      e.key === "Enter" && openDeleteColumnModal(colIndex)}
-                    aria-label="Remover Linha"
-                  >
-                    <IoMdTrash />
-                  </div>
-                </div>
-                <input
-                  id="performance_level_input"
-                  class="grow bg-surface-500 dark:bg-dark-surface p-1 text-lg rounded-md max-h-7 text-center max-w-48"
-                  type="text"
-                  value={level.name}
-                  on:keydown={(e) =>
-                    e.key === "Enter" &&
-                    handleFieldChange(
-                      `performance_levels.${$rubric.performance_levels.indexOf(level)}.name`,
-                      e.target?.value
-                    )}
-                />
-                <br />
-                <input
-                  id="performance_level_value_input"
-                  class="grow bg-surface-500 dark:bg-dark-surface text-lg rounded-md max-h-7 text-center max-w-24 mt-1"
-                  type="number"
-                  min="0"
-                  value={level.value}
-                  on:keydown={(e) =>
-                    e.key === "Enter" &&
-                    handleFieldChange(
-                      `performance_levels.${$rubric.performance_levels.indexOf(level)}.value`,
-                      e.target?.value
-                    )}
-                />
-                {$t("points")}
-              </th>
-            {/each}
-          </tr>
-        </thead>
-        <!-- CRITÉRIOS -->
-        <tbody class="table-row-group text-center">
-          {#each $rubric.criteria as criterion, cIndex}
-            <tr class="transition-all">
-              <td
-                class="drag-drop-row-cell border border-tertiary-500 border-solid bg-secondary-500 dark:bg-dark-secondary"
-                class:over={cIndex === isOver}
-                data-index={cIndex}
-                data-id={cIndex}
-                draggable="true"
-                on:dragstart={onDragStartRow}
-                on:dragover|preventDefault={onDragOverRow}
-                on:drop={onDropRow}
-              >
-                <div class="indicator cursor-grab">
-                  <div class="indicator-item indicator-bottom indicator-start">
-                    <div
-                      class="hover:text-error-500 w-5 mt-9 ml-3.5"
-                      role="button"
-                      tabindex="0"
-                      on:click={() => openDeleteRowModal(cIndex)}
-                      on:keydown={(e) =>
-                        e.key === "Enter" && openDeleteRowModal(cIndex)}
-                      aria-label="Remover Linha"
-                    >
-                      <IoMdTrash />
-                    </div>
-                  </div>
-                  <span
-                    class="text-xl font-semibold text-center text-black dark:text-white cursor-grab"
-                    >≡</span
-                  >
-                </div>
-              </td>
-              <!-- Ícone de drag-and-drop -->
-              <td class="border border-tertiary-500 border-solid p-2">
-                <input
-                  id="criterion_input"
-                  class="grow bg-secondary-500 dark:bg-dark-secondary p-1 text-lg rounded-md max-h-7 text-center font-medium"
-                  type="text"
-                  value={criterion.name}
-                  on:keydown={(e) =>
-                    e.key === "Enter" &&
-                    handleFieldChange(
-                      `criteria.${cIndex}.name`,
-                      e.target?.value
-                    )}
-                />
-              </td>
-              {#each criterion.descriptors as descriptor, dIndex}
-                <td
-                  class="border border-tertiary-500 border-solid p-0.5 max-w-32 min-w-32 break-words"
-                >
-                  <div
-                    id="descriptor_cell"
-                    class="w-full min-h-20 max-h-20 p-0.5 overflow-auto text-center text-sm bg-secondary-500 dark:bg-dark-secondary font-medium"
-                    role="button"
-                    tabindex="0"
-                    on:click={() => openEditModal(cIndex, dIndex)}
-                    on:keydown={(e) =>
-                      e.key === "Enter" && openEditModal(cIndex, dIndex)}
-                    aria-label="Editar descritor"
-                  >
-                    {descriptor ? descriptor : ""}
-                  </div>
-                </td>
-              {/each}
-            </tr>
-          {/each}
-        </tbody>
-      </table>
-    </div>
+   <!-- MATRIZ DA RUBRICA -->
+   <div class="max-w-[100vw] max-h-[68vh] overflow-x-auto overflow-y-auto">
+     <table class="table-fixed border-collapse mt-5">
+       <thead
+         class="table-header-group bg-secondary-500 dark:bg-dark-secondary text-md"
+       >
+         <tr>
+           <th
+             class="drag-drop-row-cell border border-tertiary-500 border-solid"
+           ></th>
+           <!-- PERFORMANCE LEVELS -->
+           <th class="border border-tertiary-500 border-solid"
+             >{$t("criterion")}</th
+           >
+           {#each $rubric.performance_levels as level, colIndex}
+             <th
+               class="border border-tertiary-500 border-solid p-4"
+               class:over={colIndex === isOver}
+               data-index={colIndex}
+               data-id={colIndex}
+               draggable="true"
+               on:dragstart={onDragStartColumn}
+               on:dragover|preventDefault={onDragOverColumn}
+               on:drop={onDropColumn}
+             >
+               <div
+                 class="flex flex-row flex-nowrap justify-between items-center cursor-grab w-full h-4 mb-2"
+               >
+                 <span
+                   id="grab_drop_btn_column"
+                   class="text-xl font-semibold text-center text-black dark:text-white cursor-grab"
+                   >≡</span
+                 >
+                 <div
+                   id="delete_column_btn"
+                   class="hover:text-error-500 w-5"
+                   role="button"
+                   tabindex="0"
+                   on:click={() => openDeleteColumnModal(colIndex)}
+                   on:keydown={(e) =>
+                     e.key === "Enter" && openDeleteColumnModal(colIndex)}
+                   aria-label="Remover Linha"
+                 >
+                   <IoMdTrash />
+                 </div>
+               </div>
+               <input
+                 id="performance_level_input_{colIndex}"
+                 class="grow bg-surface-500 dark:bg-dark-surface p-1 text-lg rounded-md max-h-7 text-center max-w-48"
+                 type="text"
+                 value={level.name}
+                 on:keydown={(e) =>
+                   e.key === "Enter" &&
+                   handleFieldChange(
+                     `performance_levels.${$rubric.performance_levels.indexOf(level)}.name`,
+                     e.target?.value
+                   )}
+               />
+               <br />
+               <input
+                 id="performance_level_value_input_{colIndex}"
+                 class="grow bg-surface-500 dark:bg-dark-surface text-lg rounded-md max-h-7 text-center max-w-24 mt-1"
+                 type="number"
+                 min="0"
+                 value={level.value}
+                 on:keydown={(e) =>
+                   e.key === "Enter" &&
+                   handleFieldChange(
+                     `performance_levels.${$rubric.performance_levels.indexOf(level)}.value`,
+                     e.target?.value
+                   )}
+               />
+               {$t("points")}
+             </th>
+           {/each}
+         </tr>
+       </thead>
+       <!-- CRITÉRIOS -->
+       <tbody class="table-row-group text-center">
+         {#each $rubric.criteria as criterion, cIndex}
+           <tr class="transition-all">
+             <td
+               class="drag-drop-row-cell border border-tertiary-500 border-solid bg-secondary-500 dark:bg-dark-secondary"
+               class:over={cIndex === isOver}
+               data-index={cIndex}
+               data-id={cIndex}
+               draggable="true"
+               on:dragstart={onDragStartRow}
+               on:dragover|preventDefault={onDragOverRow}
+               on:drop={onDropRow}
+             >
+               <div class="indicator cursor-grab">
+                 <div class="indicator-item indicator-bottom indicator-start">
+                   <div
+                     class="hover:text-error-500 w-5 mt-9 ml-3.5"
+                     role="button"
+                     tabindex="0"
+                     on:click={() => openDeleteRowModal(cIndex)}
+                     on:keydown={(e) =>
+                       e.key === "Enter" && openDeleteRowModal(cIndex)}
+                     aria-label="Remover Linha"
+                   >
+                     <IoMdTrash />
+                   </div>
+                 </div>
+                 <span
+                   class="text-xl font-semibold text-center text-black dark:text-white cursor-grab"
+                   >≡</span
+                 >
+               </div>
+             </td>
+             <!-- Ícone de drag-and-drop -->
+             <td class="border border-tertiary-500 border-solid p-2">
+               <input
+                 id="criterion_input_{cIndex}"
+                 class="grow bg-secondary-500 dark:bg-dark-secondary p-1 text-lg rounded-md max-h-7 text-center font-medium"
+                 type="text"
+                 value={criterion.name}
+                 on:keydown={(e) =>
+                   e.key === "Enter" &&
+                   handleFieldChange(
+                     `criteria.${cIndex}.name`,
+                     e.target?.value
+                   )}
+               />
+             </td>
+             {#each criterion.descriptors as descriptor, dIndex}
+               <td
+                 class="border border-tertiary-500 border-solid p-0.5 max-w-32 min-w-32 break-words"
+               >
+                 <div
+                   id="descriptor_cell_{cIndex}_{dIndex}"
+                   class="w-full min-h-20 max-h-20 p-0.5 overflow-auto text-center text-sm bg-secondary-500 dark:bg-dark-secondary font-medium"
+                   role="button"
+                   tabindex="0"
+                   on:click={() => openEditModal(cIndex, dIndex)}
+                   on:keydown={(e) =>
+                     e.key === "Enter" && openEditModal(cIndex, dIndex)}
+                   aria-label="Editar descritor"
+                 >
+                   {descriptor ? descriptor : ""}
+                 </div>
+               </td>
+             {/each}
+           </tr>
+         {/each}
+       </tbody>
+     </table>
+   </div>
     <!-- TAGS DA RUBRICA -->
     <div class="w-max-[100vw] flex justify-between items-center">
       <div class="flex justify-start" id="rubric_tags_label">
@@ -865,6 +954,8 @@
       modalButton={$t("modal_confirm_button")}
     />
 
+    <Toast />
+
     
 <!-- Modal de aviso de edição -->
 <Modal modalId="edit_warning_modal" modalFunction={saveAll} modalTitle={$t('edit_rubric_warning_title')} modalMessage={$t('edit_rubric_warning_message')} modalButton={$t('modal_confirm_button')} />
@@ -883,6 +974,12 @@
     min-width: 15.4vw;
   }
 
+  :global(.error_selected) {
+    
+    background-color: rgba(255, 0, 0, 0.2) !important; /* Fundo vermelho claro */
+    border: 2px solid red !important; /* Borda vermelha */
+  }
+
   .hover-up {
     transition:
       transform 0.2s ease-in-out,
@@ -898,4 +995,5 @@
     max-width: 2.5rem;
     min-width: 2.5rem;
   }
+
 </style>
