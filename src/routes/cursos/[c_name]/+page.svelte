@@ -50,7 +50,7 @@
     version: number;
   }[];
   let students: {
-    student_id: string;
+    id: string;
     email: string;
     nome: string;
     matricula: string;
@@ -62,7 +62,14 @@
     evaluation_notes: string;
     groupd_id: string;
     student_id: string;
+    professor_id: string;
     score: number;
+    rubric_evaluation: rubric_evaluation[];
+  }
+
+  interface rubric_evaluation {
+    criterion_number: number;
+    level_number: number;
   }
 
   let course_name: string;
@@ -374,6 +381,51 @@
     tour.start();
   };
 
+  async function sendEvaluationNotification(evaluationId: string) {
+    console.log("Enviando notificação para avaliação:", evaluationId);
+
+    // Filtra a avaliação correta pelo `id` do Firebase
+    const evaluation = evaluations.find(e => e.id === evaluationId);
+
+    if (!evaluation) {
+      console.error("Erro: Avaliação não encontrada!", evaluationId);
+      return alert("Erro: Avaliação não encontrada!");
+    }
+
+    if (!evaluation.evaluation_result || evaluation.evaluation_result.length === 0) {
+      console.error("Erro: Nenhum resultado de avaliação encontrado!", evaluation);
+      return alert("Erro: Nenhum resultado de avaliação encontrado!");
+    }
+
+    // Filtra apenas os alunos que participam dessa avaliação
+    const filtered_students = students.filter(student => {
+        const match = evaluation.evaluation_result.some(result => result.student_id === student.id);
+        console.log(`🧐 Verificando aluno ${student.nome} (ID: ${student.id}):`, match);
+        return match;
+    });
+
+    //console.log("Dados filtrados:", { evaluation});
+
+    try {
+      const response = await fetch("/api/notify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ evaluation, students: filtered_students }),
+      });
+
+      const responseText = await response.text(); // Captura o erro detalhado do backend
+      console.log("Resposta do servidor:", responseText);
+
+      if (!response.ok) {
+        throw new Error("Erro ao enviar notificação.");
+      }
+
+      alert("Notificação enviada com sucesso!");
+    } catch (error) {
+      console.error("Erro ao enviar notificação:", error);
+    }
+  }
+
   onMount(() => {
     if ($page.url.searchParams.get('tour_active')) {
         startTour();
@@ -543,6 +595,7 @@
                             <button
                               id="evaluation_notify"
                               class="w-5 h-5 text-cyan-600 dark:text-cyan-400 hover:text-cyan-400 dark:hover:text-cyan-200"
+                              on:click={() => sendEvaluationNotification(evaluation.id)}
                             >
                               <FaBell />
                             </button>

@@ -30,6 +30,7 @@
 		"firebase-admin": "^12.0.0",
 		"flag-icons": "^7.2.3",
 		"node-nlp": "^4.27.0",
+		"nodemailer": "^6.10.0",
 		"papaparse": "^5.4.1",
 		"rubric": "file:",
 		"shepherd.js": "^14.3.0",
